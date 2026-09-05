@@ -454,55 +454,197 @@
       color: #fff;
       border-color: var(--primary);
     }
+    /* Enhanced Reading Typography & Natural Spacing */
     .read-word {
-      display: inline-block;
+      display: inline;
       cursor: pointer;
       border-radius: 4px;
-      padding: 0 3px;
-      margin: 0 1px;
-      transition: all 0.12s ease;
+      padding: 1px 2px;
+      margin: 0;
+      transition: background 0.12s ease, color 0.12s ease;
       color: inherit;
+      font-weight: 500;
     }
     .read-word:hover {
-      background: rgba(28, 176, 246, 0.35);
+      background: rgba(56, 189, 248, 0.25);
       color: #38bdf8;
       text-decoration: underline;
     }
     .read-word.saved {
-      border-bottom: 2px solid var(--accent-yellow);
+      text-decoration: underline 2px solid var(--accent-yellow);
+      text-underline-offset: 3px;
     }
+
+    /* Reading View Mode & Font Size Toolbar */
+    .btn-view-mode {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-view-mode:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+    }
+    .btn-view-mode.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #0B0F19;
+      font-weight: 800;
+      box-shadow: 0 2px 8px rgba(88, 204, 2, 0.35);
+    }
+    .btn-font-size {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-font-size:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    /* Paragraph View Styling */
+    .article-paragraph {
+      margin-bottom: 22px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      line-height: 1.95;
+      font-size: var(--article-font-size, 17px);
+      letter-spacing: -0.01em;
+      word-spacing: normal;
+      color: #F1F5F9;
+      position: relative;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .article-paragraph:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.035);
+    }
+    .article-paragraph:last-child {
+      margin-bottom: 6px;
+    }
+    .paragraph-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .paragraph-text {
+      display: block;
+      word-break: keep-all;
+    }
+    .read-sentence-span {
+      display: inline;
+      padding: 2px 5px;
+      margin: 0 1px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+    }
+    .read-sentence-span:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .read-sentence-span.selected-target {
+      background: rgba(88, 204, 2, 0.16);
+      box-shadow: 0 0 0 1.5px rgba(88, 204, 2, 0.5);
+      color: #FFFFFF;
+    }
+    .read-sentence-span.active-reading {
+      background: rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 0 2px #38bdf8;
+      color: #FFFFFF;
+      border-radius: 6px;
+    }
+    .sentence-inline-audio {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      font-size: 11px;
+      margin-left: 5px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      border: none;
+      opacity: 0.55;
+      transition: opacity 0.15s, transform 0.15s, background 0.15s;
+      vertical-align: middle;
+    }
+    .read-sentence-span:hover .sentence-inline-audio,
+    .read-sentence-span.selected-target .sentence-inline-audio,
+    .read-sentence-span.active-reading .sentence-inline-audio {
+      opacity: 1;
+      background: rgba(88, 204, 2, 0.25);
+    }
+    .sentence-inline-audio:hover {
+      transform: scale(1.2);
+      background: var(--primary);
+      color: #0B0F19;
+    }
+
+    /* Sentence-by-Sentence View Styling */
     .read-sentence-row {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 12px;
-      padding: 8px 10px;
-      border-radius: 12px;
-      transition: background 0.2s ease;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.15s ease, border-color 0.15s ease;
+      cursor: pointer;
     }
     .read-sentence-row:hover {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
     }
     .read-sentence-row.active-reading {
       background: rgba(28, 176, 246, 0.15);
+      border-color: rgba(28, 176, 246, 0.4);
       box-shadow: 0 0 12px rgba(28, 176, 246, 0.2);
     }
     .read-sentence-row.selected-target {
-      background: rgba(88, 204, 2, 0.15);
-      border-left: 3px solid var(--primary);
+      background: rgba(88, 204, 2, 0.14);
+      border-left: 4px solid var(--primary);
+      border-color: rgba(88, 204, 2, 0.4);
     }
     .sentence-action-btn {
-      background: transparent;
-      border: none;
-      font-size: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-size: 14px;
       cursor: pointer;
-      padding: 2px 4px;
-      opacity: 0.7;
-      transition: opacity 0.15s;
+      padding: 4px 6px;
+      opacity: 0.85;
+      transition: all 0.15s ease;
     }
     .sentence-action-btn:hover {
       opacity: 1;
       transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.15);
     }
     .score-badge {
       font-size: 26px;
@@ -1039,8 +1181,26 @@
           <span>단어를 터치하면 <strong>즉시 단어 설명</strong>이 뜨고 <strong>단어장에 등록</strong>할 수 있어요!</span>
         </div>
 
+        <!-- Reading View Mode & Font Size Toolbar -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 12px; background: rgba(0,0,0,0.25); border-radius: 14px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-view-mode active" id="btnModeParagraph" onclick="setReadingViewMode('paragraph')">
+              📖 단락 자연스러운 읽기
+            </button>
+            <button class="btn-view-mode" id="btnModeSentence" onclick="setReadingViewMode('sentence')">
+              📋 문장별 분할 학습
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">글자 크기:</span>
+            <button class="btn-font-size" onclick="adjustArticleFontSize(-1)" title="글자 작게">A-</button>
+            <span id="articleFontSizeLabel" style="font-size: 11px; font-weight: 800; color: #fff; min-width: 32px; text-align: center;">17px</span>
+            <button class="btn-font-size" onclick="adjustArticleFontSize(1)" title="글자 크게">A+</button>
+          </div>
+        </div>
+
         <!-- Article Sentences Body -->
-        <div id="readerBody" style="font-size: 16px; line-height: 2.1; color: #E2E8F0;">
+        <div id="readerBody" style="min-height: 120px;">
           <!-- Injected by JS -->
         </div>
       </div>
@@ -3014,6 +3174,21 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   let shadowRecognition = null;
   let isShadowRecording = false;
   let currentLookupData = null;
+  let currentReadingViewMode = 'paragraph'; // 'paragraph' | 'sentence'
+  let articleFontSize = 17;
+
+  const ARTICLE_PARAGRAPHS = {
+    "art-1": [[0, 1], [2, 3], [4, 5]],
+    "art-2": [[0, 1], [2, 3, 4]],
+    "art-3": [[0, 1, 2], [3, 4]],
+    "art-4": [[0, 1, 2], [3, 4]],
+    "art-5": [[0, 1, 2], [3, 4]],
+    "art-6": [[0, 1], [2, 3, 4]],
+    "art-7": [[0, 1], [2, 3, 4]],
+    "art-8": [[0, 1, 2], [3, 4]],
+    "art-9": [[0, 1], [2, 3, 4]],
+    "art-10": [[0, 1], [2, 3, 4]]
+  };
 
   function switchNav(tabName) {
     playClickSound();
@@ -3142,48 +3317,167 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     playClickSound();
   }
 
+  function setReadingViewMode(mode) {
+    currentReadingViewMode = mode;
+    const pBtn = document.getElementById('btnModeParagraph');
+    const sBtn = document.getElementById('btnModeSentence');
+    if (pBtn) pBtn.classList.toggle('active', mode === 'paragraph');
+    if (sBtn) sBtn.classList.toggle('active', mode === 'sentence');
+
+    if (currentArticle) {
+      renderArticleContent(currentArticle);
+      selectTargetSentence(selectedShadowIndex);
+    }
+    playClickSound();
+  }
+
+  function adjustArticleFontSize(delta) {
+    articleFontSize = Math.max(14, Math.min(22, articleFontSize + delta));
+    const readerBody = document.getElementById('readerBody');
+    if (readerBody) {
+      readerBody.style.setProperty('--article-font-size', `${articleFontSize}px`);
+    }
+    const label = document.getElementById('articleFontSizeLabel');
+    if (label) label.textContent = `${articleFontSize}px`;
+    playClickSound();
+  }
+
+  function partitionIntoParagraphs(totalSentences) {
+    if (totalSentences <= 3) return [Array.from({length: totalSentences}, (_, i) => i)];
+    if (totalSentences === 4) return [[0, 1], [2, 3]];
+    if (totalSentences === 5) return [[0, 1], [2, 3, 4]];
+    if (totalSentences === 6) return [[0, 1], [2, 3], [4, 5]];
+    const res = [];
+    for (let i = 0; i < totalSentences; i += 3) {
+      const chunk = [];
+      for (let j = i; j < Math.min(totalSentences, i + 3); j++) chunk.push(j);
+      res.push(chunk);
+    }
+    return res;
+  }
+
+  function buildSentenceTokens(sentence, sIdx) {
+    const frag = document.createDocumentFragment();
+    // Split into English word units (including contractions like don't, I'm) and delimiters/spaces
+    const tokens = sentence.match(/([a-zA-Z0-9'-]+|[^a-zA-Z0-9'-]+)/g) || [sentence];
+    
+    tokens.forEach(token => {
+      if (/^[a-zA-Z0-9'-]+$/.test(token)) {
+        const cleanWord = token.replace(/[^a-zA-Z]/g, '').toLowerCase();
+        const span = document.createElement('span');
+        span.className = "read-word";
+        const isSaved = currentProfile && currentProfile.bookmarks && currentProfile.bookmarks.some(b => b.type === 'vocab' && b.word.toLowerCase() === cleanWord);
+        if (isSaved) span.classList.add('saved');
+
+        span.textContent = token;
+        span.onclick = (e) => lookupWord(token, sentence, e);
+        frag.appendChild(span);
+      } else {
+        // Natural punctuation and spacing without artificial inline-block gaps
+        frag.appendChild(document.createTextNode(token));
+      }
+    });
+    return frag;
+  }
+
   function renderArticleContent(article) {
     const container = document.getElementById('readerBody');
     if (!container) return;
     container.innerHTML = "";
+    container.style.setProperty('--article-font-size', `${articleFontSize}px`);
 
     const fragment = document.createDocumentFragment();
-    article.sentences.forEach((sentence, sIdx) => {
-      const row = document.createElement('div');
-      row.className = `read-sentence-row ${sIdx === selectedShadowIndex ? 'selected-target' : ''}`;
-      row.id = `sentRow_${sIdx}`;
+    const paragraphGroups = (article.paragraphs) || ARTICLE_PARAGRAPHS[article.id] || partitionIntoParagraphs(article.sentences.length);
 
-      const btnCol = document.createElement('div');
-      btnCol.style.cssText = "display: flex; gap: 4px; padding-top: 2px;";
-      btnCol.innerHTML = `
-        <button class="sentence-action-btn" onclick="playSingleSentence(${sIdx})" title="이 문장 원어민 음성 듣기">🔊</button>
-        <button class="sentence-action-btn" onclick="selectTargetSentence(${sIdx})" title="이 문장 따라 읽기(쉐도잉) 선택">🎙️</button>
-      `;
+    if (currentReadingViewMode === 'paragraph') {
+      // 📖 PARAGRAPH VIEW MODE (자연스러운 문단 읽기)
+      paragraphGroups.forEach((sentIndices, pIdx) => {
+        const pDiv = document.createElement('div');
+        pDiv.className = "article-paragraph";
+        pDiv.id = `paraGroup_${pIdx}`;
 
-      const textWrap = document.createElement('div');
-      textWrap.style.flex = "1";
+        const badge = document.createElement('div');
+        badge.className = "paragraph-badge";
+        badge.innerHTML = `<span>§ 단락 ${pIdx + 1}</span>`;
+        pDiv.appendChild(badge);
 
-      const rawTokens = sentence.split(/(\s+)/);
-      rawTokens.forEach(token => {
-        if (/^\s+$/.test(token)) {
-          textWrap.appendChild(document.createTextNode(token));
-        } else {
-          const cleanWord = token.replace(/[^a-zA-Z]/g, '').toLowerCase();
-          const span = document.createElement('span');
-          span.className = "read-word";
-          const isSaved = currentProfile && currentProfile.bookmarks && currentProfile.bookmarks.some(b => b.type === 'vocab' && b.word.toLowerCase() === cleanWord);
-          if (isSaved) span.classList.add('saved');
+        const pText = document.createElement('div');
+        pText.className = "paragraph-text";
 
-          span.textContent = token;
-          span.onclick = (e) => lookupWord(token, sentence, e);
-          textWrap.appendChild(span);
-        }
+        sentIndices.forEach((sIdx, localIdx) => {
+          const sentence = article.sentences[sIdx];
+          if (!sentence) return;
+
+          const sentSpan = document.createElement('span');
+          sentSpan.className = `read-sentence-span ${sIdx === selectedShadowIndex ? 'selected-target' : ''}`;
+          sentSpan.id = `sentSpan_${sIdx}`;
+          sentSpan.onclick = () => {
+            selectTargetSentence(sIdx);
+            playClickSound();
+          };
+
+          // Append natural tokens
+          sentSpan.appendChild(buildSentenceTokens(sentence, sIdx));
+
+          // Inline audio icon
+          const audioBtn = document.createElement('button');
+          audioBtn.className = "sentence-inline-audio";
+          audioBtn.title = "이 문장 음성 듣기";
+          audioBtn.innerHTML = "🔊";
+          audioBtn.onclick = (e) => {
+            e.stopPropagation();
+            playSingleSentence(sIdx);
+          };
+          sentSpan.appendChild(audioBtn);
+
+          pText.appendChild(sentSpan);
+
+          if (localIdx < sentIndices.length - 1) {
+            pText.appendChild(document.createTextNode(" "));
+          }
+        });
+
+        pDiv.appendChild(pText);
+        fragment.appendChild(pDiv);
       });
+    } else {
+      // 📋 SENTENCE-BY-SENTENCE VIEW MODE (문장별 집중 학습)
+      paragraphGroups.forEach((sentIndices, pIdx) => {
+        const pHeader = document.createElement('div');
+        pHeader.style.cssText = "display: flex; align-items: center; gap: 8px; margin: 16px 0 10px 0;";
+        pHeader.innerHTML = `
+          <span class="paragraph-badge" style="margin-bottom:0;">§ 단락 ${pIdx + 1}</span>
+          <div style="flex:1; height:1px; background: rgba(255,255,255,0.08);"></div>
+        `;
+        fragment.appendChild(pHeader);
 
-      row.appendChild(btnCol);
-      row.appendChild(textWrap);
-      fragment.appendChild(row);
-    });
+        sentIndices.forEach(sIdx => {
+          const sentence = article.sentences[sIdx];
+          if (!sentence) return;
+
+          const row = document.createElement('div');
+          row.className = `read-sentence-row ${sIdx === selectedShadowIndex ? 'selected-target' : ''}`;
+          row.id = `sentRow_${sIdx}`;
+          row.onclick = () => selectTargetSentence(sIdx);
+
+          const btnCol = document.createElement('div');
+          btnCol.style.cssText = "display: flex; gap: 4px; padding-top: 2px;";
+          btnCol.innerHTML = `
+            <button class="sentence-action-btn" onclick="event.stopPropagation(); playSingleSentence(${sIdx})" title="이 문장 원어민 음성 듣기">🔊</button>
+            <button class="sentence-action-btn" onclick="event.stopPropagation(); selectTargetSentence(${sIdx})" title="이 문장 따라 읽기(쉐도잉) 선택">🎙️</button>
+          `;
+
+          const textWrap = document.createElement('div');
+          textWrap.style.cssText = "flex: 1; font-size: var(--article-font-size, 17px); line-height: 1.85; color: #F1F5F9; word-spacing: normal;";
+          textWrap.appendChild(buildSentenceTokens(sentence, sIdx));
+
+          row.appendChild(btnCol);
+          row.appendChild(textWrap);
+          fragment.appendChild(row);
+        });
+      });
+    }
+
     container.appendChild(fragment);
   }
 
@@ -3214,11 +3508,16 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       return;
     }
 
-    document.querySelectorAll('.read-sentence-row').forEach(r => r.classList.remove('active-reading'));
+    document.querySelectorAll('.read-sentence-row, .read-sentence-span').forEach(r => r.classList.remove('active-reading'));
     const curRow = document.getElementById(`sentRow_${articleAudioIndex}`);
     if (curRow) {
       curRow.classList.add('active-reading');
       curRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    const curSpan = document.getElementById(`sentSpan_${articleAudioIndex}`);
+    if (curSpan) {
+      curSpan.classList.add('active-reading');
+      curSpan.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     const sentence = currentArticle.sentences[articleAudioIndex];
@@ -3244,7 +3543,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   function stopArticleAudio() {
     isPlayingArticle = false;
     if (speechSynth.speaking) speechSynth.cancel();
-    document.querySelectorAll('.read-sentence-row').forEach(r => r.classList.remove('active-reading'));
+    document.querySelectorAll('.read-sentence-row, .read-sentence-span').forEach(r => r.classList.remove('active-reading'));
     const playBtn = document.getElementById('btnPlayAll');
     if (playBtn) {
       playBtn.classList.remove('btn-red');
@@ -3261,9 +3560,11 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   function playSingleSentence(sIdx) {
     if (!currentArticle) return;
     stopArticleAudio();
-    document.querySelectorAll('.read-sentence-row').forEach(r => r.classList.remove('active-reading'));
+    document.querySelectorAll('.read-sentence-row, .read-sentence-span').forEach(r => r.classList.remove('active-reading'));
     const curRow = document.getElementById(`sentRow_${sIdx}`);
     if (curRow) curRow.classList.add('active-reading');
+    const curSpan = document.getElementById(`sentSpan_${sIdx}`);
+    if (curSpan) curSpan.classList.add('active-reading');
 
     speakText(currentArticle.sentences[sIdx]);
   }
@@ -3271,8 +3572,11 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   function selectTargetSentence(idx) {
     if (!currentArticle || !currentArticle.sentences[idx]) return;
     selectedShadowIndex = idx;
-    document.querySelectorAll('.read-sentence-row').forEach((r, i) => {
-      r.classList.toggle('selected-target', i === idx);
+    
+    document.querySelectorAll('.read-sentence-row, .read-sentence-span').forEach((el) => {
+      const elId = el.id;
+      const isTarget = (elId === `sentRow_${idx}` || elId === `sentSpan_${idx}`);
+      el.classList.toggle('selected-target', isTarget);
     });
 
     const box = document.getElementById('shadowTargetBox');
