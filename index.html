@@ -986,6 +986,31 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+    /* Voice EQ Wave Visualizer */
+    .voice-wave-visualizer {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      height: 20px;
+      vertical-align: middle;
+      padding: 0 4px;
+    }
+    .v-bar {
+      width: 3px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 2px;
+      animation: eqWaveAnim 0.7s ease-in-out infinite alternate;
+    }
+    .v-bar:nth-child(2) { animation-delay: 0.15s; height: 14px; background: #1CB0F6; }
+    .v-bar:nth-child(3) { animation-delay: 0.3s; height: 18px; background: var(--accent-yellow); }
+    .v-bar:nth-child(4) { animation-delay: 0.45s; height: 12px; background: #1CB0F6; }
+    .v-bar:nth-child(5) { animation-delay: 0.6s; height: 8px; background: var(--primary); }
+
+    @keyframes eqWaveAnim {
+      0% { transform: scaleY(0.3); opacity: 0.5; }
+      100% { transform: scaleY(1.4); opacity: 1; }
+    }
     /* SLA 4 Strands & Research Elements */
     .sla-strands-box {
       background: #17242C;
@@ -1041,9 +1066,9 @@
 <div id="app-container">
   <!-- Duolingo Sticky Header -->
   <header class="duo-header">
-    <div class="stat-pill streak" onclick="showToast('🔥 ' + currentProfile.streak + '일 연속 학습 중!')">
+    <div class="stat-pill streak" id="headerStreakPill" onclick="showStreakModal()" title="🔥 연속 학습 스트릭 현황 확인" style="cursor: pointer; box-shadow: 0 0 10px rgba(255, 120, 0, 0.35);">
       <span>🔥</span>
-      <span id="streakCount">1</span>
+      <span id="streakCount" style="font-weight: 900;">1일차</span>
     </div>
     <div class="stat-pill xp" onclick="showToast('⚡ 총 ' + currentProfile.xp + ' XP를 모았어요!')">
       <span>⚡</span>
@@ -1291,6 +1316,7 @@
         <div class="ai-subtext" id="aiSubText">대화 불러오는 중...</div>
         <div class="bubble-actions">
           <button class="bubble-btn" onclick="playAiSpeechAgain()">🔊 다시 듣기</button>
+          <button class="bubble-btn" id="btnAiSpeedToggle" onclick="toggleAiSpeechSpeed()" title="음성 재생 속도 조절 (0.8x / 1.0x / 1.2x)">⚡ 1.0x 표준</button>
           <button class="bubble-btn" onclick="toggleKoreanTranslation()">🇰🇷 한국어 번역</button>
         </div>
       </div>
@@ -1310,6 +1336,12 @@
     <!-- 3-Tier Native Feedback Cards (Appears after speaking) -->
     <div class="feedback-container" id="feedbackContainer" style="display: none;">
       <!-- Injected by JS -->
+    </div>
+
+    <!-- Voice Waveform Visualizer during STT -->
+    <div id="sessionWaveVisualizer" style="display: none; align-items: center; justify-content: center; gap: 4px; margin-bottom: 8px; padding: 6px 12px; background: rgba(88, 204, 2, 0.08); border-radius: 9999px;">
+      <span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span>
+      <span style="font-size: 11px; color: var(--primary); font-weight: 800; margin-left: 6px;">🎙️ 음성 인식 중... 자연스럽게 말씀하세요!</span>
     </div>
 
     <!-- User Live Transcript -->
@@ -1609,6 +1641,12 @@
     <div style="display: flex; gap: 8px; margin-bottom: 14px;">
       <button class="filter-pill active" id="btnVocabModeList" onclick="switchVocabMode('list')">📋 목록 보기</button>
       <button class="filter-pill" id="btnVocabModeFlash" onclick="switchVocabMode('flash')">🧠 폴 네이션 1분 간격 인출 플래시카드</button>
+    </div>
+
+    <!-- Real-time Vocab Search Bar & Count Badge -->
+    <div id="vocabSearchWrap" style="margin-bottom: 12px; display: flex; gap: 8px; align-items: center;">
+      <input type="text" id="inputVocabSearch" class="form-input" style="padding: 9px 12px; font-size: 13px; border-radius: 12px; flex: 1;" placeholder="🔍 단어 또는 뜻 검색..." oninput="filterVocabList(this.value)">
+      <span id="vocabCountBadge" style="font-size: 11px; font-weight: 800; color: var(--primary); white-space: nowrap; background: rgba(88,204,2,0.15); padding: 7px 10px; border-radius: 10px;">0개</span>
     </div>
 
     <!-- List View Container -->
@@ -2098,10 +2136,50 @@
   function initApp() {
     initWebAudio();
     initSpeechRecognition();
+    setupBackdropClose();
     const hasProfile = loadStoredData();
     if (hasProfile) {
+      updateDailyStreak();
       renderMapNodes();
     }
+  }
+
+  function setupBackdropClose() {
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closeModal(overlay.id);
+          playClickSound();
+        }
+      });
+    });
+  }
+
+  function updateDailyStreak() {
+    if (!currentProfile) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (!currentProfile.streak) currentProfile.streak = 1;
+    if (!currentProfile.lastActiveDate) {
+      currentProfile.lastActiveDate = today;
+    } else if (currentProfile.lastActiveDate !== today) {
+      const lastDate = new Date(currentProfile.lastActiveDate);
+      const currDate = new Date(today);
+      const diffDays = Math.round((currDate - lastDate) / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
+        currentProfile.streak = (currentProfile.streak || 1) + 1;
+        showToast(`🔥 대단해요! ${currentProfile.streak}일 연속 학습 달성!`);
+      } else if (diffDays > 1) {
+        currentProfile.streak = 1;
+      }
+      currentProfile.lastActiveDate = today;
+      saveProfiles();
+    }
+  }
+
+  function showStreakModal() {
+    const streak = currentProfile ? (currentProfile.streak || 1) : 1;
+    showToast(`🔥 현재 ${streak}일차 연속 학습 중! 오늘도 목표를 달성해 보세요!`);
+    playChime();
   }
 
   function loadStoredData() {
@@ -2286,13 +2364,13 @@
     if (!currentProfile) {
       document.getElementById('profileName').textContent = "프로필 만들기";
       document.getElementById('profileAvatar').textContent = "👤";
-      document.getElementById('streakCount').textContent = "0";
+      document.getElementById('streakCount').textContent = "0일차";
       document.getElementById('xpCount').textContent = "0";
       return;
     }
     document.getElementById('profileName').textContent = currentProfile.name;
     document.getElementById('profileAvatar').textContent = currentProfile.avatar;
-    document.getElementById('streakCount').textContent = currentProfile.streak;
+    document.getElementById('streakCount').textContent = (currentProfile.streak || 1) + "일차";
     document.getElementById('xpCount').textContent = currentProfile.xp;
 
     // Update Unit Banner based on level
@@ -2422,7 +2500,24 @@
 
   function playAiSpeechAgain() {
     const text = document.getElementById('aiSpeechText').textContent;
-    if (text) speakText(text);
+    if (text) speakText(text, aiSpeechSpeed);
+  }
+
+  let aiSpeechSpeed = 1.0;
+  function toggleAiSpeechSpeed() {
+    if (aiSpeechSpeed === 1.0) {
+      aiSpeechSpeed = 0.8;
+    } else if (aiSpeechSpeed === 0.8) {
+      aiSpeechSpeed = 1.2;
+    } else {
+      aiSpeechSpeed = 1.0;
+    }
+    const btn = document.getElementById('btnAiSpeedToggle');
+    if (btn) {
+      btn.innerHTML = (aiSpeechSpeed === 0.8) ? '🐢 0.8x 또박또박' : (aiSpeechSpeed === 1.2 ? '🐇 1.2x 실전' : '⚡ 1.0x 표준');
+    }
+    playClickSound();
+    playAiSpeechAgain();
   }
 
   function toggleKoreanTranslation() {
@@ -2461,6 +2556,8 @@
       document.getElementById('micBtnIcon').textContent = "⏹️";
       document.getElementById('micBtnText').textContent = "듣고 있어요...";
       document.getElementById('userTranscriptBox').classList.add('recording');
+      const wave = document.getElementById('sessionWaveVisualizer');
+      if (wave) wave.style.display = "flex";
       startWaveformSimulation();
     };
 
@@ -2521,6 +2618,8 @@
     document.getElementById('micBtnIcon').textContent = "🎙️";
     document.getElementById('micBtnText').textContent = "터치하고 말하기";
     document.getElementById('userTranscriptBox').classList.remove('recording');
+    const wave = document.getElementById('sessionWaveVisualizer');
+    if (wave) wave.style.display = "none";
     stopWaveformSimulation();
   }
 
@@ -2833,7 +2932,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     } catch(e) {}
   }
 
-  function speakText(text) {
+  function speakText(text, overrideSpeed) {
     if (!speechSynth) return;
     speechSynth.cancel();
 
@@ -2845,8 +2944,8 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     const usVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes("Samantha") || v.name.includes("Natural") || v.name.includes("Google")));
     if (usVoice) utter.voice = usVoice;
 
-    const speed = parseFloat(localStorage.getItem('duospeak_voice_speed') || '1.0');
-    utter.rate = speed;
+    const baseSpeed = parseFloat(localStorage.getItem('duospeak_voice_speed') || '1.0');
+    utter.rate = overrideSpeed || baseSpeed;
 
     speechSynth.speak(utter);
   }
@@ -3592,6 +3691,20 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     speakText(currentArticle.sentences[selectedShadowIndex]);
   }
 
+  let shadowMediaRecorder = null;
+  let shadowMediaStream = null;
+  let shadowAudioChunks = [];
+  let lastRecordedShadowAudioUrl = null;
+
+  function playRecordedShadowAudio() {
+    if (lastRecordedShadowAudioUrl) {
+      const audio = new Audio(lastRecordedShadowAudioUrl);
+      audio.play();
+    } else {
+      showToast("녹음된 오디오가 없습니다. 마이크를 켜고 읽어보세요.");
+    }
+  }
+
   function toggleShadowingMic() {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
@@ -3602,6 +3715,9 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     const btn = document.getElementById('btnShadowMic');
     if (isShadowRecording) {
       if (shadowRecognition) shadowRecognition.stop();
+      if (shadowMediaRecorder && shadowMediaRecorder.state !== 'inactive') {
+        try { shadowMediaRecorder.stop(); } catch(e) {}
+      }
       isShadowRecording = false;
       btn.classList.remove('btn-red');
       btn.classList.add('btn-green');
@@ -3618,7 +3734,40 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       const targetText = currentArticle.sentences[selectedShadowIndex] || "";
       const scoreCard = document.getElementById('shadowScoreCard');
       scoreCard.style.display = "block";
-      scoreCard.innerHTML = `<div style="color:var(--text-muted); font-size:13px;">듣는 중... 천천히 소리 내어 읽어보세요 🎙️</div>`;
+      scoreCard.innerHTML = `
+        <div style="display:flex; align-items:center; gap:6px; color:var(--text-muted); font-size:13px;">
+          <div class="voice-wave-visualizer">
+            <span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span>
+          </div>
+          <span>듣는 중... 천천히 소리 내어 읽어보세요 🎙️</span>
+        </div>
+      `;
+
+      // Start MediaRecorder if available for voice replay
+      shadowAudioChunks = [];
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+          shadowMediaStream = stream;
+          try {
+            shadowMediaRecorder = new MediaRecorder(stream);
+            shadowMediaRecorder.ondataavailable = (e) => {
+              if (e.data && e.data.size > 0) shadowAudioChunks.push(e.data);
+            };
+            shadowMediaRecorder.onstop = () => {
+              if (shadowAudioChunks.length > 0) {
+                const blob = new Blob(shadowAudioChunks, { type: 'audio/webm' });
+                if (lastRecordedShadowAudioUrl) URL.revokeObjectURL(lastRecordedShadowAudioUrl);
+                lastRecordedShadowAudioUrl = URL.createObjectURL(blob);
+              }
+              if (shadowMediaStream) {
+                shadowMediaStream.getTracks().forEach(t => t.stop());
+                shadowMediaStream = null;
+              }
+            };
+            shadowMediaRecorder.start();
+          } catch(e) { console.log("MediaRecorder init:", e); }
+        }).catch(err => { console.log("Mic audio capture optional:", err); });
+      }
 
       btn.classList.remove('btn-green');
       btn.classList.add('btn-red');
@@ -3631,10 +3780,18 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
           transcript += event.results[i][0].transcript;
         }
         if (event.results[0].isFinal) {
+          if (shadowMediaRecorder && shadowMediaRecorder.state !== 'inactive') {
+            try { shadowMediaRecorder.stop(); } catch(e) {}
+          }
           finishShadowEvaluation(targetText, transcript);
         } else {
           scoreCard.innerHTML = `
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">실시간 인식:</div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <div class="voice-wave-visualizer">
+                <span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span><span class="v-bar"></span>
+              </div>
+              <span style="font-size:12px; color:var(--text-muted);">실시간 인식:</span>
+            </div>
             <div style="font-size:14px; color:#FFFFFF;">${transcript}</div>
           `;
         }
@@ -3642,6 +3799,9 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
 
       shadowRecognition.onerror = (e) => {
         isShadowRecording = false;
+        if (shadowMediaRecorder && shadowMediaRecorder.state !== 'inactive') {
+          try { shadowMediaRecorder.stop(); } catch(e) {}
+        }
         btn.classList.remove('btn-red');
         btn.classList.add('btn-green');
         btn.innerHTML = "🎙️ 따라 읽기 시작";
@@ -3649,6 +3809,9 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
 
       shadowRecognition.onend = () => {
         isShadowRecording = false;
+        if (shadowMediaRecorder && shadowMediaRecorder.state !== 'inactive') {
+          try { shadowMediaRecorder.stop(); } catch(e) {}
+        }
         btn.classList.remove('btn-red');
         btn.classList.add('btn-green');
         btn.innerHTML = "🎙️ 따라 읽기 시작";
@@ -3707,8 +3870,16 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       <div style="font-size:13px; font-weight:700; color:#fff; margin-bottom:8px;">${praise}</div>
       <div style="margin-bottom:8px; font-size:12px; color:var(--text-muted);">발음 단어 분석:</div>
       <div style="margin-bottom:8px;">${wordPillsHtml}</div>
-      <div style="font-size:11px; color:var(--text-muted); background:rgba(0,0,0,0.25); padding:6px 10px; border-radius:8px;">
+      <div style="font-size:11px; color:var(--text-muted); background:rgba(0,0,0,0.25); padding:6px 10px; border-radius:8px; margin-bottom:10px;">
         인식된 내 음성: "${spokenText}"
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-3d btn-blue" id="btnReplayMyVoice" style="flex:1; padding:9px 12px; font-size:12px; border-radius:12px;" onclick="playRecordedShadowAudio()">
+          🎧 내 발음 다시 듣기
+        </button>
+        <button class="btn-3d btn-outline" style="flex:1; padding:9px 12px; font-size:12px; border-radius:12px;" onclick="listenTargetSentence()">
+          🔊 원어민 발음 비교
+        </button>
       </div>
     `;
 
@@ -3825,6 +3996,12 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     switchVocabMode(currentVocabMode || 'list');
   }
 
+  let currentVocabSearchQuery = '';
+  function filterVocabList(query) {
+    currentVocabSearchQuery = (query || '').trim().toLowerCase();
+    renderVocabList(currentVocabSearchQuery);
+  }
+
   function switchVocabMode(mode) {
     currentVocabMode = mode;
     playClickSound();
@@ -3833,41 +4010,65 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     const btnFlash = document.getElementById('btnVocabModeFlash');
     const listCont = document.getElementById('vocabListContainer');
     const flashCont = document.getElementById('vocabFlashcardView');
+    const searchWrap = document.getElementById('vocabSearchWrap');
 
     if (mode === 'list') {
       if (btnList) btnList.classList.add('active');
       if (btnFlash) btnFlash.classList.remove('active');
       if (listCont) listCont.style.display = "flex";
       if (flashCont) flashCont.style.display = "none";
-      renderVocabList();
+      if (searchWrap) searchWrap.style.display = "flex";
+      renderVocabList(currentVocabSearchQuery);
     } else {
       if (btnFlash) btnFlash.classList.add('active');
       if (btnList) btnList.classList.remove('active');
       if (listCont) listCont.style.display = "none";
       if (flashCont) flashCont.style.display = "block";
+      if (searchWrap) searchWrap.style.display = "none";
+      
+      const allItems = (currentProfile && currentProfile.bookmarks) ? currentProfile.bookmarks : [];
+      activeFlashcardDeck = allItems.slice();
       flashcardIdx = 0;
       flashcardFlipped = false;
       renderCurrentFlashcard();
     }
   }
 
-  function renderVocabList() {
+  function renderVocabList(query = '') {
     const container = document.getElementById('vocabListContainer');
     if (!container) return;
     container.innerHTML = "";
-    const list = (currentProfile && currentProfile.bookmarks) ? currentProfile.bookmarks : [];
+    const allList = (currentProfile && currentProfile.bookmarks) ? currentProfile.bookmarks : [];
+
+    const badge = document.getElementById('vocabCountBadge');
+    if (badge) badge.textContent = `${allList.length}개`;
+
+    let list = allList;
+    if (query) {
+      list = allList.filter(item => {
+        if (item.type === 'vocab') {
+          return (item.word && item.word.toLowerCase().includes(query)) ||
+                 (item.defKo && item.defKo.toLowerCase().includes(query)) ||
+                 (item.defEn && item.defEn.toLowerCase().includes(query));
+        } else {
+          return (item.native && item.native.toLowerCase().includes(query)) ||
+                 (item.original && item.original.toLowerCase().includes(query));
+        }
+      });
+    }
 
     if (list.length === 0) {
       container.innerHTML = `
         <div style="text-align: center; color: var(--text-muted); padding: 40px 10px;">
           <div style="font-size: 40px; margin-bottom: 10px;">★</div>
-          <div>아직 저장된 단어나 북마크 표현이 없습니다.<br>리딩 중 단어를 터치하여 등록하거나 회화 중 [★ 북마크]를 눌러보세요!</div>
+          <div>${query ? `"${query}" 검색 결과가 없습니다.` : '아직 저장된 단어나 북마크 표현이 없습니다.<br>리딩 중 단어를 터치하여 등록하거나 회화 중 [★ 북마크]를 눌러보세요!'}</div>
         </div>
       `;
     } else {
       const fragment = document.createDocumentFragment();
       list.forEach((item, idx) => {
         const card = document.createElement('div');
+        card.className = "vocab-card";
         card.style.cssText = "background:#101B20; border:1px solid var(--card-border); border-radius:14px; padding:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;";
 
         if (item.type === 'vocab') {
@@ -3910,12 +4111,13 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   }
 
   // Paul Nation's Spaced Retrieval Flashcards Engine
+  let activeFlashcardDeck = [];
   function renderCurrentFlashcard() {
     const container = document.getElementById('vocabFlashcardView');
     if (!container) return;
-    const list = (currentProfile && currentProfile.bookmarks) ? currentProfile.bookmarks : [];
+    const list = activeFlashcardDeck;
 
-    if (list.length === 0) {
+    if (!list || list.length === 0) {
       container.innerHTML = `
         <div style="text-align: center; color: var(--text-muted); padding: 40px 10px;">
           <div style="font-size: 40px; margin-bottom: 10px;">🧠</div>
@@ -3935,7 +4137,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
           <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5;">
             폴 네이션 교수의 간격 인출(Spaced Retrieval) 효과로 기억 보존율이 대폭 향상되었습니다.
           </div>
-          <button class="btn-3d btn-green" style="border-radius: 14px; padding: 10px 24px; font-size: 14px;" onclick="flashcardIdx=0; flashcardFlipped=false; renderCurrentFlashcard();">
+          <button class="btn-3d btn-green" style="border-radius: 14px; padding: 10px 24px; font-size: 14px;" onclick="activeFlashcardDeck=((currentProfile&&currentProfile.bookmarks)?currentProfile.bookmarks:[]).slice(); flashcardIdx=0; flashcardFlipped=false; renderCurrentFlashcard();">
             🔄 첫 카드부터 다시 복습하기
           </button>
         </div>
@@ -3972,7 +4174,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
         </div>
       `;
     } else {
-      // Back: Reveal and assess recall
+      // Back: Reveal and assess recall (3 stages)
       container.innerHTML = `
         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
           <span>🧠 간격 인출 훈련 (${flashcardIdx + 1} / ${list.length})</span>
@@ -3987,12 +4189,15 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
           <div style="font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 8px;">${def}</div>
           ${item.example ? `<div style="font-size: 12px; color: #CBD5E1; font-style: italic;">"${item.example}"</div>` : ''}
         </div>
-        <div style="display: flex; gap: 10px; margin-top: 14px;">
-          <button class="btn-3d btn-outline" style="flex: 1; padding: 10px; border-radius: 12px; font-size: 13px;" onclick="nextFlashcard(false)">
-            🔄 아직 헷갈려요
+        <div style="display: flex; gap: 8px; margin-top: 14px;">
+          <button class="btn-3d btn-red" style="flex: 1; padding: 10px 4px; border-radius: 12px; font-size: 12px;" onclick="nextFlashcard('fail')">
+            ❌ 몰라요
           </button>
-          <button class="btn-3d btn-green" style="flex: 1; padding: 10px; border-radius: 12px; font-size: 13px;" onclick="nextFlashcard(true)">
-            👍 기억나요! (+5 XP)
+          <button class="btn-3d btn-yellow" style="flex: 1; padding: 10px 4px; border-radius: 12px; font-size: 12px;" onclick="nextFlashcard('retry')">
+            🤔 헷갈려요 (재도전)
+          </button>
+          <button class="btn-3d btn-green" style="flex: 1; padding: 10px 4px; border-radius: 12px; font-size: 12px;" onclick="nextFlashcard('pass')">
+            ✓ 완벽해요 (+10 XP)
           </button>
         </div>
       `;
@@ -4005,12 +4210,20 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     renderCurrentFlashcard();
   }
 
-  function nextFlashcard(remembered) {
-    if (remembered) {
-      addXp(5);
+  function nextFlashcard(choice) {
+    const curItem = activeFlashcardDeck[flashcardIdx];
+    if (choice === 'pass') {
+      addXp(10);
       playChime();
+      showToast("✓ 완벽 암기! +10 XP");
+    } else if (choice === 'retry') {
+      playClickSound();
+      showToast("🤔 헷갈림: 단어가 덱 뒤에 재배치되었습니다.");
+      if (curItem) activeFlashcardDeck.push(curItem);
     } else {
       playClickSound();
+      showToast("❌ 미암기: 단어가 덱 뒤에 재배치되었습니다.");
+      if (curItem) activeFlashcardDeck.push(curItem);
     }
     flashcardIdx++;
     flashcardFlipped = false;
