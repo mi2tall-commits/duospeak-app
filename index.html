@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DuoSpeak AI | 듀오스픽 영어 회화</title>
+  <meta name="description" content="듀오링고처럼 중독되고 Gemini 3.6 Flash로 입이 터지는 온가족 10단계 AI 영어 회화">
+  <meta name="theme-color" content="#131F24">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
+  
+  <!-- Canvas Confetti for Stage Clear Celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #131F24;
+      --card-bg: #1B2B33;
+      --card-border: #2B4553;
+      --primary: #58CC02;
+      --primary-border: #46A302;
+      --primary-text: #FFFFFF;
+      --accent-blue: #1CB0F6;
+      --accent-blue-border: #1899D6;
+      --accent-yellow: #FFC800;
+      --accent-yellow-border: #E5A400;
+      --accent-orange: #FF9600;
+      --accent-red: #FF4B4B;
+      --accent-purple: #CE82FF;
+      --text-main: #FFFFFF;
+      --text-muted: #8FA4AF;
+      --text-dim: #546B78;
+      --font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 500px;
+      min-height: 100vh;
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 90px;
+    }
+
+    /* 3D Tactile Buttons (Duolingo Style) */
+    .btn-3d {
+      font-family: inherit;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.08s ease, filter 0.15s ease;
+      position: relative;
+      text-transform: uppercase;
+      font-size: 15px;
+    }
+    .btn-3d:active {
+      transform: translateY(4px) !important;
+      box-shadow: 0 0 0 !important;
+    }
+    .btn-green {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 5px 0 var(--primary-border);
+    }
+    .btn-blue {
+      background: var(--accent-blue);
+      color: #FFFFFF;
+      box-shadow: 0 5px 0 var(--accent-blue-border);
+    }
+    .btn-yellow {
+      background: var(--accent-yellow);
+      color: #241400;
+      box-shadow: 0 5px 0 var(--accent-yellow-border);
+    }
+    .btn-outline {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 2px solid var(--card-border);
+      box-shadow: 0 4px 0 var(--card-border);
+    }
+
+    /* Header Bar */
+    header.duo-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(19, 31, 36, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--card-border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+    }
+    .stat-pill.streak { color: var(--accent-orange); }
+    .stat-pill.xp { color: var(--accent-yellow); }
+    .stat-pill.profile {
+      color: #FFFFFF;
+      background: rgba(88, 204, 2, 0.15);
+      border-color: rgba(88, 204, 2, 0.4);
+    }
+
+    /* Bottom Navigation Bar */
+    nav.duo-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 500px;
+      background: rgba(19, 31, 36, 0.98);
+      backdrop-filter: blur(14px);
+      border-top: 2px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 100;
+    }
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 14px;
+      border-radius: 12px;
+      transition: all 0.15s;
+    }
+    .nav-tab span.icon { font-size: 22px; }
+    .nav-tab.active {
+      color: var(--primary);
+    }
+    .nav-tab:active { transform: scale(0.92); }
+
+    /* Road Map Section */
+    .map-container {
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+    .unit-banner {
+      width: 100%;
+      background: linear-gradient(135deg, #1cb0f6, #0e85c0);
+      border-radius: 20px;
+      padding: 18px 20px;
+      box-shadow: 0 6px 0 #0b6999;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #FFFFFF;
+    }
+    .unit-banner.lv-green {
+      background: linear-gradient(135deg, #58CC02, #46A302);
+      box-shadow: 0 6px 0 #347c01;
+    }
+    .unit-banner.lv-purple {
+      background: linear-gradient(135deg, #CE82FF, #9B45DF);
+      box-shadow: 0 6px 0 #7b2eb8;
+    }
+    .unit-badge {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+    .unit-title { font-size: 18px; font-weight: 900; }
+    .unit-desc { font-size: 13px; opacity: 0.9; margin-top: 2px; }
+
+    /* Interactive Stepping Stone Nodes */
+    .nodes-path {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 26px;
+      width: 100%;
+      position: relative;
+    }
+    .node-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+    }
+    .node-btn {
+      width: 80px;
+      height: 74px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .node-btn:active { transform: translateY(5px); box-shadow: 0 0 0 !important; }
+    .node-btn.completed {
+      background: var(--accent-yellow);
+      box-shadow: 0 8px 0 var(--accent-yellow-border);
+      color: #241400;
+    }
+    .node-btn.current {
+      background: var(--primary);
+      box-shadow: 0 8px 0 var(--primary-border);
+      color: #FFFFFF;
+      animation: pulseNode 2s infinite ease-in-out;
+    }
+    .node-btn.locked {
+      background: #24353E;
+      box-shadow: 0 8px 0 #18252C;
+      color: #556B77;
+      cursor: not-allowed;
+    }
+    .node-crown {
+      position: absolute;
+      top: -12px;
+      right: -6px;
+      font-size: 20px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+    .node-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      text-align: center;
+      max-width: 140px;
+      line-height: 1.3;
+    }
+    @keyframes pulseNode {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      width: 100%;
+      max-width: 440px;
+      background: #17242C;
+      border: 2px solid var(--card-border);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      transform: scale(0.92);
+      transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-overlay.active .modal-card { transform: scale(1); }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 20px; font-weight: 900; }
+    .btn-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      background: #101B20;
+      border: 2px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 15px;
+      color: #FFFFFF;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary);
+    }
+    .avatar-picker {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .avatar-opt {
+      font-size: 28px;
+      background: #101B20;
+      border: 2px solid var(--card-border);
+      border-radius: 14px;
+      padding: 8px 0;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .avatar-opt.selected {
+      border-color: var(--primary);
+      background: rgba(88, 204, 2, 0.2);
+      transform: scale(1.08);
+    }
+
+    /* Speaking Stage Screen (Session) */
+    .session-view {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg-color);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .session-view.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .session-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .progress-bar-wrap {
+      flex: 1;
+      height: 16px;
+      background: #24353E;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #58CC02, #78EC12);
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+    .session-hearts {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 800;
+      color: var(--accent-red);
+      font-size: 15px;
+    }
+
+    /* Dialogue Card */
+    .dialogue-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .ai-bubble {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .ai-avatar {
+      font-size: 46px;
+      background: #1B2B33;
+      border: 2px solid var(--card-border);
+      border-radius: 20px;
+      padding: 10px;
+      box-shadow: 0 4px 0 var(--card-border);
+    }
+    .speech-bubble {
+      flex: 1;
+      background: #1B2B33;
+      border: 2px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
+      position: relative;
+      box-shadow: 0 4px 0 var(--card-border);
+    }
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 24px;
+      width: 0; height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-right: 10px solid var(--card-border);
+    }
+    .ai-text {
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.4;
+      color: #FFFFFF;
+    }
+    .ai-subtext {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 600;
+      display: none;
+    }
+    .bubble-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .bubble-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .bubble-btn:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.15); }
+
+    /* Waveform Canvas */
+    .waveform-wrap {
+      width: 100%;
+      height: 48px;
+      background: #101B20;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    canvas#waveformCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Konglish Radar Notification */
+    .konglish-banner {
+      background: rgba(255, 75, 75, 0.18);
+      border: 2px solid var(--accent-red);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #FFA6A6;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    /* 3-Tier Native Feedback Cards */
+    .feedback-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .fb-card {
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .fb-card.grammar {
+      background: rgba(88, 204, 2, 0.12);
+      border: 1px solid rgba(88, 204, 2, 0.35);
+      color: #A3FF5C;
+    }
+    .fb-card.native {
+      background: rgba(28, 176, 246, 0.15);
+      border: 1.5px solid var(--accent-blue);
+      color: #8CE0FF;
+    }
+    .fb-card.slang {
+      background: rgba(206, 130, 255, 0.12);
+      border: 1px solid rgba(206, 130, 255, 0.35);
+      color: #F0BCFF;
+    }
+    .fb-tag {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fb-body {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    /* User Transcript Area */
+    .user-transcript-box {
+      background: #101B20;
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 60px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .user-transcript-box.recording {
+      border-color: var(--accent-red);
+      background: rgba(255, 75, 75, 0.08);
+    }
+    .placeholder-pulse {
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    /* Session Bottom Controls */
+    .session-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .mic-btn-main {
+      flex: 1;
+      height: 64px;
+      font-size: 18px;
+      border-radius: 20px;
+    }
+    .mic-btn-main.recording {
+      background: var(--accent-red) !important;
+      box-shadow: 0 5px 0 #b32424 !important;
+      animation: pulseMic 1s infinite alternate;
+    }
+    @keyframes pulseMic {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.04); }
+    }
+    .btn-hint-trigger {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    /* 3-Tier Hint Drawer */
+    .hint-drawer {
+      background: #1B2B33;
+      border: 2px solid var(--accent-yellow);
+      border-radius: 20px;
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      animation: fadeIn 0.2s ease;
+    }
+    .hint-tier {
+      background: #101B20;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    .hint-label {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--accent-yellow);
+      margin-bottom: 2px;
+    }
+    .hint-val {
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    /* Toast Notification */
+    .duo-toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      background: var(--primary);
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 15px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: none;
+    }
+    .duo-toast.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <!-- Duolingo Sticky Header -->
+  <header class="duo-header">
+    <div class="stat-pill streak" onclick="showToast('🔥 ' + currentProfile.streak + '일 연속 학습 중!')">
+      <span>🔥</span>
+      <span id="streakCount">1</span>
+    </div>
+    <div class="stat-pill xp" onclick="showToast('⚡ 총 ' + currentProfile.xp + ' XP를 모았어요!')">
+      <span>⚡</span>
+      <span id="xpCount">0</span>
+    </div>
+    <div class="stat-pill profile" onclick="openProfileModal()">
+      <span id="profileAvatar">🦉</span>
+      <span id="profileName">나</span>
+      <span style="font-size: 11px; opacity: 0.7;">▼</span>
+    </div>
+    <button class="btn-outline" style="padding: 6px 10px; border-radius: 12px; font-size: 16px;" onclick="openSettingsModal()" title="AI 설정">
+      ⚙️
+    </button>
+  </header>
+
+  <!-- Main View: Duolingo Stepping Stone Map -->
+  <main class="map-container" id="mainMapView">
+    <!-- Level Banner -->
+    <div class="unit-banner lv-green" id="unitBanner">
+      <div>
+        <span class="unit-badge" id="unitBadge">UNIT 1 · 입문</span>
+        <h2 class="unit-title" id="unitTitle">기초 생존 회화</h2>
+        <p class="unit-desc" id="unitDesc">기초 단어로 해외에서 막힘없이 주문하기</p>
+      </div>
+      <div style="font-size: 40px;" id="unitIcon">☕</div>
+    </div>
+
+    <!-- Stepping Stone Nodes Path -->
+    <div class="nodes-path" id="nodesPath">
+      <!-- Injected by JavaScript based on current Level (1~10) -->
+    </div>
+
+    <!-- Custom Scenario Floating Button -->
+    <div style="width: 100%; margin-top: 10px;">
+      <button class="btn-3d btn-outline" style="width: 100%; border-radius: 18px;" onclick="openCustomScenarioModal()">
+        ✨ 나만의 맞춤 상황 만들기 (테니스, 러닝, 직구 등)
+      </button>
+    </div>
+  </main>
+
+  <!-- Bottom Nav Tabs -->
+  <nav class="duo-nav">
+    <div class="nav-tab active" onclick="switchNav('learn')">
+      <span class="icon">🗺️</span>
+      <span>학습 맵</span>
+    </div>
+    <div class="nav-tab" onclick="switchNav('vocab')">
+      <span class="icon">★</span>
+      <span>내 오답장</span>
+    </div>
+    <div class="nav-tab" onclick="openProfileModal()">
+      <span class="icon">👥</span>
+      <span>가족 전환</span>
+    </div>
+    <div class="nav-tab" onclick="openSettingsModal()">
+      <span class="icon">⚙️</span>
+      <span>설정</span>
+    </div>
+  </nav>
+</div>
+
+<!-- ========================================== -->
+<!-- 🎙️ FULL-SCREEN SPEAKING SESSION VIEW       -->
+<!-- ========================================== -->
+<div class="session-view" id="sessionView">
+  <!-- Session Top Bar -->
+  <div class="session-header">
+    <button class="btn-outline" style="width: 40px; height: 40px; border-radius: 50%; font-size: 18px; padding: 0;" onclick="confirmExitSession()">
+      ✕
+    </button>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="sessionProgressFill"></div>
+    </div>
+    <div class="session-hearts">
+      <span>💚</span>
+      <span id="sessionHearts">5</span>
+    </div>
+  </div>
+
+  <!-- Dialogue Box -->
+  <div class="dialogue-box">
+    <!-- AI Speech Bubble -->
+    <div class="ai-bubble">
+      <div class="ai-avatar" id="aiAvatarIcon">🦉</div>
+      <div class="speech-bubble">
+        <div class="ai-text" id="aiSpeechText">Loading dialogue...</div>
+        <div class="ai-subtext" id="aiSubText">대화 불러오는 중...</div>
+        <div class="bubble-actions">
+          <button class="bubble-btn" onclick="playAiSpeechAgain()">🔊 다시 듣기</button>
+          <button class="bubble-btn" onclick="toggleKoreanTranslation()">🇰🇷 한국어 번역</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dual Waveform Canvas for Pitch Comparison -->
+    <div class="waveform-wrap">
+      <canvas id="waveformCanvas"></canvas>
+    </div>
+
+    <!-- Konglish Radar Warning Banner -->
+    <div class="konglish-banner" id="konglishBanner">
+      <span>🚨</span>
+      <span id="konglishText">콩글리시 감지!</span>
+    </div>
+
+    <!-- 3-Tier Native Feedback Cards (Appears after speaking) -->
+    <div class="feedback-container" id="feedbackContainer" style="display: none;">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- User Live Transcript -->
+    <div class="user-transcript-box" id="userTranscriptBox">
+      <span class="placeholder-pulse" id="transcriptPlaceholder">하단 마이크를 누르고 영어로 말해보세요 🎙️</span>
+    </div>
+  </div>
+
+  <!-- Session Bottom Controls -->
+  <div class="session-footer">
+    <!-- 3-Tier Hint Drawer -->
+    <div class="hint-drawer" id="hintDrawer">
+      <div class="hint-tier">
+        <div class="hint-label">💡 LEVEL 1 · 핵심 키워드</div>
+        <div class="hint-val" id="hintWords">-</div>
+      </div>
+      <div class="hint-tier">
+        <div class="hint-label">🧩 LEVEL 2 · 문장 뼈대</div>
+        <div class="hint-val" id="hintStarter">-</div>
+      </div>
+      <div class="hint-tier">
+        <div class="hint-label">🚀 LEVEL 3 · 원터치 치트키</div>
+        <div class="hint-val" id="hintFull">-</div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <button class="btn-3d btn-yellow btn-hint-trigger" id="btnHint" onclick="toggleHintDrawer()" title="말문 막힘 방지 3단 힌트">
+        💡
+      </button>
+
+      <button class="btn-3d btn-green mic-btn-main" id="btnMic" onclick="toggleSpeechRecognition()">
+        <span id="micBtnIcon">🎙️</span>
+        <span id="micBtnText">터치하고 말하기</span>
+      </button>
+
+      <button class="btn-3d btn-blue" id="btnNextTurn" style="display: none; height: 64px; border-radius: 20px; padding: 0 24px;" onclick="proceedNextTurn()">
+        계속하기 ➔
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 👥 MODAL: Family Profile & Level Switcher  -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">가족 프로필 관리</h3>
+      <button class="btn-close" onclick="closeModal('profileModal')">✕</button>
+    </div>
+
+    <!-- Active Profiles List -->
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;" id="profileListContainer">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Add New Profile Toggle -->
+    <div style="border-top: 2px dashed var(--card-border); padding-top: 18px;">
+      <h4 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">+ 새 가족 프로필 추가</h4>
+      <div class="form-group">
+        <label class="form-label">이름 또는 별명</label>
+        <input type="text" id="newProfileName" class="form-input" placeholder="예: 엄마, 아빠, 다람이, 민수">
+      </div>
+      <div class="form-group">
+        <label class="form-label">캐릭터 선택</label>
+        <div class="avatar-picker" id="newAvatarPicker">
+          <div class="avatar-opt selected" onclick="selectAvatar(this, '🦉')">🦉</div>
+          <div class="avatar-opt" onclick="selectAvatar(this, '🦊')">🦊</div>
+          <div class="avatar-opt" onclick="selectAvatar(this, '🐱')">🐱</div>
+          <div class="avatar-opt" onclick="selectAvatar(this, '🐻')">🐻</div>
+          <div class="avatar-opt" onclick="selectAvatar(this, '🐼')">🐼</div>
+          <div class="avatar-opt" onclick="selectAvatar(this, '🦁')">🦁</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">시작 레벨 선택 (10단계)</label>
+        <select id="newProfileLevel" class="form-select">
+          <optgroup label="🌱 초급 그룹 (울렁증 극복 & 생존)">
+            <option value="1">Lv 1. 단어 나열 & 제스처 (Pre-A1)</option>
+            <option value="2">Lv 2. 기초 문장 뼈대 세우기 (A1)</option>
+            <option value="3" selected>Lv 3. 해외여행 생존 실전 (A2)</option>
+          </optgroup>
+          <optgroup label="🌿 중급 그룹 (일상 회화 & 콩글리시 탈출)">
+            <option value="4">Lv 4. 일상 & 취미 스몰토크 (B1-Low)</option>
+            <option value="5">Lv 5. 과거 경험 & 감정 표현 (B1-High)</option>
+            <option value="6">Lv 6. 콩글리시 탈출 & 원어민 뉘앙스 (B2-Low)</option>
+            <option value="7">Lv 7. 돌발 상황 & 문제 해결 (B2-High)</option>
+          </optgroup>
+          <optgroup label="🌳 고급 그룹 (유창한 프리토킹 & 비즈니스)">
+            <option value="8">Lv 8. 생각 논리적으로 전달하기 (C1-Low)</option>
+            <option value="9">Lv 9. 현지 원어민 슬랭 & 관용구 (C1-Mid)</option>
+            <option value="10">Lv 10. 프로페셔널 비즈니스 & 토론 (C1-High)</option>
+          </optgroup>
+        </select>
+      </div>
+      <button class="btn-3d btn-green" style="width: 100%; border-radius: 16px;" onclick="addNewProfile()">
+        프로필 생성 완료
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- ⚙️ MODAL: Settings (Gemini Key & Voice)     -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">환경 설정</h3>
+      <button class="btn-close" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Google Gemini API Key (기기 공용)</label>
+      <input type="password" id="inputGeminiApiKey" class="form-input" placeholder="AQ... 또는 AIzaSy...">
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">
+        💡 한 번 저장하면 이 기기의 모든 가족 프로필이 키 입력 없이 함께 사용합니다.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">AI 모델</label>
+      <input type="text" id="inputGeminiModel" class="form-input" value="gemini-3.6-flash" readonly style="opacity: 0.8;">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">음성 속도</label>
+      <select id="voiceSpeedSelect" class="form-select">
+        <option value="0.8">0.8배속 (초급 추천 - 매우 또박또박)</option>
+        <option value="0.9">0.9배속 (약간 느리게)</option>
+        <option value="1.0" selected>1.0배속 (정상 원어민 속도)</option>
+        <option value="1.15">1.15배속 (실전 빠른 현지 속도)</option>
+      </select>
+    </div>
+
+    <button class="btn-3d btn-green" style="width: 100%; border-radius: 16px; margin-top: 10px;" onclick="saveSettings()">
+      설정 저장하기
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- ✨ MODAL: Custom Scenario Creator          -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="customModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">✨ 맞춤 상황 만들기</h3>
+      <button class="btn-close" onclick="closeModal('customModal')">✕</button>
+    </div>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+      테니스, 러닝, 해외 직구, 출장 등 내가 연습하고 싶은 상황을 적어주시면 AI가 즉석에서 3턴 대화 스테이지를 생성합니다.
+    </p>
+    <div class="form-group">
+      <label class="form-label">연습하고 싶은 상황</label>
+      <input type="text" id="customScenarioInput" class="form-input" placeholder="예: 테니스 경기 후 파트너 포핸드 샷 칭찬하기">
+    </div>
+    <div class="form-group">
+      <label class="form-label">AI 상대방 역할</label>
+      <input type="text" id="customRoleInput" class="form-input" placeholder="예: 테니스 파트너 (Alex)">
+    </div>
+    <button class="btn-3d btn-blue" style="width: 100%; border-radius: 16px;" onclick="launchCustomScenario()">
+      🚀 즉시 회화 시작하기
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- ★ MODAL: Vocabulary / Bookmark Deck       -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="vocabModal">
+  <div class="modal-card" style="max-width: 480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">★ 내 오답 & 북마크 표현장</h3>
+      <button class="btn-close" onclick="closeModal('vocabModal')">✕</button>
+    </div>
+    <div id="vocabListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto;">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</div>
+
+<div class="duo-toast" id="duoToast">알림 메시지</div>
+
+<!-- ========================================== -->
+<!-- 🧠 JAVASCRIPT APP CORE LOGIC               -->
+<!-- ========================================== -->
+<script>
+  // -------------------------------------------------------------
+  // 1. CONFIG & DEFAULT PRESETS
+  // -------------------------------------------------------------
+  const DEFAULT_GEMINI_KEY = atob("QVEuQWI4Uk42SU5JakgzTWQxd1NzcklHNjZud1BfNzBQLUltUUs1ZVVaaUxyZllqNWo3M2c=");
+  const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
+
+  // 10-Level System Roadmaps
+  const ROADMAP_DATA = {
+    1: { badge: "UNIT 1 · 입문", title: "단어 나열 & 제스처", desc: "한두 단어로 툭툭 던지며 의사 표현하기", icon: "☕", stages: [
+      { id: "1-1", title: "카페에서 커피 주문", role: "바리스타", firstLine: "Hello! What can I get for you today?", firstLineKo: "안녕하세요! 오늘 어떤 음료를 드릴까요?" },
+      { id: "1-2", title: "길에서 화장실 묻기", role: "행인", firstLine: "Excuse me, can I help you with something?", firstLineKo: "실례합니다, 도와드릴까요?" },
+      { id: "1-3", title: "마트에서 물건 찾기", role: "직원", firstLine: "Hi there! Are you looking for anything specific?", firstLineKo: "안녕하세요! 특별히 찾으시는 게 있나요?" }
+    ]},
+    2: { badge: "UNIT 2 · 기초 문장", title: "기초 뼈대 세우기", desc: "I want..., Can I have... 기본 문장 만들기", icon: "🍔", stages: [
+      { id: "2-1", title: "식당에서 물/냅킨 요청", role: "웨이터", firstLine: "Everything good here? Do you need anything else?", firstLineKo: "식사 괜찮으신가요? 더 필요하신 것 있으세요?" },
+      { id: "2-2", title: "가게에서 가격 물어보기", role: "점원", firstLine: "That's one of our best sellers! Interested?", firstLineKo: "이게 저희 인기 상품이에요! 관심 있으세요?" },
+      { id: "2-3", title: "간단한 자기소개", role: "어학원 친구", firstLine: "Hi, I'm Sarah! Are you new to this class?", firstLineKo: "안녕, 난 사라야! 이 수업 처음 듣는 거니?" }
+    ]},
+    3: { badge: "UNIT 3 · 생존 실전", title: "해외여행 생존기", desc: "공항, 호텔, 택시, 쇼핑 필수 회화", icon: "✈️", stages: [
+      { id: "3-1", title: "공항 입국심사관과 대화", role: "입국심사관", firstLine: "Passport please. What is the purpose of your visit?", firstLineKo: "여권 보여주세요. 방문 목적이 무엇인가요?" },
+      { id: "3-2", title: "호텔 체크인 & 룸 요청", role: "호텔리어", firstLine: "Welcome to Grand Hotel! Do you have a reservation?", firstLineKo: "그랜드 호텔에 오신 것을 환영합니다! 예약하셨나요?" },
+      { id: "3-3", title: "택시 기사에게 행선지 말하기", role: "택시기사", firstLine: "Hop in! Where can I take you today?", firstLineKo: "타세요! 오늘 어디로 모실까요?" }
+    ]},
+    4: { badge: "UNIT 4 · 일상 스몰토크", title: "취미 & 주말 이야기", desc: "운동(테니스/러닝), 주말 약속 가볍게 나누기", icon: "🎾", stages: [
+      { id: "4-1", title: "테니스 파트너와 경기 후 대화", role: "테니스 동료", firstLine: "Great game today! How did your backhand feel?", firstLineKo: "오늘 경기 정말 좋았어! 백핸드 어땠어?" },
+      { id: "4-2", title: "주말 계획 묻고 답하기", role: "직장 동료", firstLine: "TGIF! Got any fun plans lined up for this weekend?", firstLineKo: "금요일이다! 이번 주말에 재밌는 계획 있어?" },
+      { id: "4-3", title: "좋아하는 음식과 맛집 추천", role: "외국인 친구", firstLine: "I'm craving something spicy tonight! Any recommendations?", firstLineKo: "오늘 매운 게 땡기는데 혹시 추천해 줄 만한 곳 있어?" }
+    ]},
+    5: { badge: "UNIT 5 · 경험 묘사", title: "과거 경험 & 감정", desc: "과거형과 현재완료로 다채로운 에피소드 풀기", icon: "📸", stages: [
+      { id: "5-1", title: "최근 다녀온 여행 썰 풀기", role: "친구", firstLine: "I saw your photos! How was your trip to Jeju?", firstLineKo: "사진 봤어! 제주도 여행 어땠어?" },
+      { id: "5-2", title: "지난 주말 운동 후기 나누기", role: "러닝 크루", firstLine: "Did you run the 10k last Sunday? How was your pace?", firstLineKo: "지난 일요일에 10km 뛰었어? 페이스 어땠니?" },
+      { id: "5-3", title: "스트레스 받았던 일 털어놓기", role: "친구", firstLine: "You look a bit exhausted today. Everything alright?", firstLineKo: "오늘 좀 피곤해 보여. 별일 없지?" }
+    ]},
+    6: { badge: "UNIT 6 · 뉘앙스 교정", title: "콩글리시 탈출 & 슬랭", desc: "더치페이, 핸드폰 대신 진짜 원어민 표현", icon: "💡", stages: [
+      { id: "6-1", title: "점심 식사 후 계산 나누기", role: "직장 동료", firstLine: "The bill is thirty dollars. How should we pay?", firstLineKo: "계산서가 30달러 나왔네. 어떻게 계산할까?" },
+      { id: "6-2", title: "스마트폰 액정 깨져서 수리점 가기", role: "수리기사", firstLine: "Ouch, that's a nasty crack. When did this happen?", firstLineKo: "액정이 심하게 깨졌네요. 언제 이렇게 됐나요?" },
+      { id: "6-3", title: "친구에게 약속 미루자고 양해 구하기", role: "친구", firstLine: "Hey, are we still meeting up at seven tonight?", firstLineKo: "야, 우리 오늘 저녁 7시에 만나는 거 맞지?" }
+    ]},
+    7: { badge: "UNIT 7 · 문제 해결", title: "돌발 상황 대처", desc: "식당 컴플레인, 환불 요청, 증상 설명", icon: "🚨", stages: [
+      { id: "7-1", title: "음식에서 머리카락이 나왔을 때", role: "식당 매니저", firstLine: "Is everything okay with your steak, sir?", firstLineKo: "손님, 스테이크에 무슨 문제라도 있으신가요?" },
+      { id: "7-2", title: "해외 직구 배송 지연 항의", role: "고객센터 상담원", firstLine: "Customer support, this is Dave. How can I help you?", firstLineKo: "고객지원팀 데이브입니다. 무엇을 도와드릴까요?" },
+      { id: "7-3", title: "현지 약국에서 감기 증상 설명", role: "약사", firstLine: "Hello! What kind of symptoms are you having?", firstLineKo: "안녕하세요! 어떤 증상이 있으신가요?" }
+    ]},
+    8: { badge: "UNIT 8 · 논리적 의견", title: "생각 & 근거 피력", desc: "내 의견을 말하고 논리적으로 이유 설명하기", icon: "🧠", stages: [
+      { id: "8-1", title: "재택근무 vs 출근 찬반 토론", role: "토론 파트너", firstLine: "Do you think working from home actually boosts productivity?", firstLineKo: "재택근무가 실제로 생산성을 높인다고 생각하시나요?" },
+      { id: "8-2", title: "스마트워치 필수인가 선택인가", role: "러닝 친구", firstLine: "Is a Garmin really worth the money for amateur runners?", firstLineKo: "아마추어 러너한테 가민 시계가 진짜 돈값 할까?" }
+    ]},
+    9: { badge: "UNIT 9 · 원어민 관용구", title: "미드 슬랭 & 유행어", desc: "현지인들이 입에 달고 사는 관용 표현", icon: "🎬", stages: [
+      { id: "9-1", title: "친구와 가벼운 잡담과 유행어", role: "원어민 친구", firstLine: "Work has been crazy lately. I feel completely swamped!", firstLineKo: "요즘 일이 미쳤어. 완전히 파묻혀 사는 기분이야!" },
+      { id: "9-2", title: "파티에서 자연스럽게 대화 끼어들기", role: "파티 호스트", firstLine: "Hey! Glad you made it! Have you tried the punch yet?", firstLineKo: "안녕! 와줘서 고마워! 펀치 음료 마셔봤어?" }
+    ]},
+    10: { badge: "UNIT 10 · 비즈니스", title: "비즈니스 & 협상", desc: "단가 협상, 정중한 거절, 프레젠테이션 Q&A", icon: "💼", stages: [
+      { id: "10-1", title: "계약 단가 및 납기 협상하기", role: "해외 거래처 담당자", firstLine: "We'd love to sign, but the unit cost seems a bit steep for us.", firstLineKo: "계약하고 싶지만 단가가 저희에겐 좀 부담스럽네요." },
+      { id: "10-2", title: "무리한 요청 정중히 거절하기", role: "클라이언트", firstLine: "Can we have this feature added by tomorrow morning?", firstLineKo: "이 기능 내일 아침까지 추가해 주실 수 있나요?" }
+    ]}
+  };
+
+  // Konglish Database for Real-Time Radar
+  const KONGLISH_DICT = {
+    "dutch pay": { ko: "더치페이", native: "Split the bill / Go Dutch" },
+    "handphone": { ko: "핸드폰", native: "Phone / Cell phone" },
+    "skinship": { ko: "스킨십", native: "Physical affection / Touch" },
+    "service": { ko: "서비스(무료)", native: "On the house / Complimentary" },
+    "sharp": { ko: "샤프 펜슬", native: "Mechanical pencil" },
+    "meeting": { ko: "소개팅/미팅", native: "Blind date / Group date" },
+    "cider": { ko: "사이다(음료)", native: "Sprite / Lemon-lime soda" },
+    "sign": { ko: "연예인 사인", native: "Autograph" },
+    "sns": { ko: "SNS", native: "Social media" },
+    "health club": { ko: "헬스장", native: "Gym / Fitness center" },
+    "as": { ko: "AS(사후서비스)", native: "Warranty / Customer service / Repair" },
+    "one plus one": { ko: "원플러스원", native: "Buy one, get one free (BOGO)" },
+    "eye shopping": { ko: "아이쇼핑", native: "Window shopping" },
+    "morning call": { ko: "모닝콜", native: "Wake-up call" }
+  };
+
+  // -------------------------------------------------------------
+  // 2. STATE & PROFILE MANAGEMENT
+  // -------------------------------------------------------------
+  let profiles = [];
+  let currentProfile = null;
+  let currentStage = null;
+  let currentTurn = 0; // 0, 1, 2 (Total 3 turns)
+  let recognition = null;
+  let isRecording = false;
+  let speechSynth = window.speechSynthesis;
+
+  function initApp() {
+    loadStoredData();
+    renderMapNodes();
+    initWebAudio();
+    initSpeechRecognition();
+  }
+
+  function loadStoredData() {
+    const rawProfiles = localStorage.getItem('duospeak_profiles');
+    if (rawProfiles) {
+      try { profiles = JSON.parse(rawProfiles); } catch(e) { profiles = []; }
+    }
+
+    if (!profiles || profiles.length === 0) {
+      // Default Initial Profiles for Family
+      profiles = [
+        { id: "p_daram", name: "다람이", avatar: "🦉", level: 3, xp: 60, streak: 3, lastActive: "2026-09-05", completed: ["1-1", "1-2"], bookmarks: [] },
+        { id: "p_mom", name: "엄마", avatar: "🐱", level: 1, xp: 20, streak: 1, lastActive: "2026-09-05", completed: ["1-1"], bookmarks: [] },
+        { id: "p_dad", name: "아빠", avatar: "🐻", level: 4, xp: 80, streak: 4, lastActive: "2026-09-05", completed: ["1-1", "1-2", "2-1"], bookmarks: [] }
+      ];
+      saveProfiles();
+    }
+
+    // Auto-Resume to Last Active Profile
+    const lastActiveId = localStorage.getItem('duospeak_active_profile_id') || profiles[0].id;
+    currentProfile = profiles.find(p => p.id === lastActiveId) || profiles[0];
+    updateHeaderStats();
+  }
+
+  function saveProfiles() {
+    localStorage.setItem('duospeak_profiles', JSON.stringify(profiles));
+    if (currentProfile) {
+      localStorage.setItem('duospeak_active_profile_id', currentProfile.id);
+    }
+  }
+
+  function updateHeaderStats() {
+    if (!currentProfile) return;
+    document.getElementById('profileName').textContent = currentProfile.name;
+    document.getElementById('profileAvatar').textContent = currentProfile.avatar;
+    document.getElementById('streakCount').textContent = currentProfile.streak;
+    document.getElementById('xpCount').textContent = currentProfile.xp;
+
+    // Update Unit Banner based on level
+    const lvl = currentProfile.level || 1;
+    const unitData = ROADMAP_DATA[lvl] || ROADMAP_DATA[1];
+    document.getElementById('unitBadge').textContent = unitData.badge;
+    document.getElementById('unitTitle').textContent = unitData.title;
+    document.getElementById('unitDesc').textContent = unitData.desc;
+    document.getElementById('unitIcon').textContent = unitData.icon;
+
+    const banner = document.getElementById('unitBanner');
+    banner.className = "unit-banner " + (lvl <= 3 ? "lv-green" : (lvl <= 7 ? "" : "lv-purple"));
+  }
+
+  // -------------------------------------------------------------
+  // 3. MAP & NODES RENDERING
+  // -------------------------------------------------------------
+  function renderMapNodes() {
+    const container = document.getElementById('nodesPath');
+    container.innerHTML = "";
+    const lvl = currentProfile.level || 1;
+    const unitData = ROADMAP_DATA[lvl] || ROADMAP_DATA[1];
+
+    unitData.stages.forEach((stage, idx) => {
+      const isCompleted = currentProfile.completed.includes(stage.id);
+      const isCurrent = !isCompleted && (idx === 0 || currentProfile.completed.includes(unitData.stages[idx - 1].id));
+      const isLocked = !isCompleted && !isCurrent;
+
+      const nodeWrap = document.createElement('div');
+      nodeWrap.className = "node-wrap";
+
+      // Slight zigzag alignment like Duolingo
+      const offset = (idx % 2 === 0) ? -28 : 28;
+      nodeWrap.style.transform = `translateX(${offset}px)`;
+
+      let nodeClass = "node-btn ";
+      if (isCompleted) nodeClass += "completed";
+      else if (isCurrent) nodeClass += "current";
+      else nodeClass += "locked";
+
+      let icon = isCompleted ? "★" : (isCurrent ? "▶" : "🔒");
+
+      nodeWrap.innerHTML = `
+        <div class="${nodeClass}" onclick="startStage('${stage.id}')">
+          ${isCompleted ? '<span class="node-crown">👑</span>' : ''}
+          <span>${icon}</span>
+        </div>
+        <div class="node-label">${stage.title}</div>
+      `;
+      container.appendChild(nodeWrap);
+    });
+  }
+
+  // -------------------------------------------------------------
+  // 4. SPEAKING SESSION CONTROLLER
+  // -------------------------------------------------------------
+  function startStage(stageId) {
+    const lvl = currentProfile.level || 1;
+    const unitData = ROADMAP_DATA[lvl] || ROADMAP_DATA[1];
+    currentStage = unitData.stages.find(s => s.id === stageId);
+    if (!currentStage) return;
+
+    currentTurn = 0;
+    document.getElementById('sessionView').classList.add('active');
+    document.getElementById('sessionHearts').textContent = "5";
+    updateSessionProgress(0);
+
+    // Initial AI turn
+    setupAiTurn(currentStage.firstLine, currentStage.firstLineKo, {
+      words: ["Yes", "Please", "Thank you"],
+      starter: "I'd like to...",
+      full: "Yes, please. I'd like to have that."
+    });
+
+    playChime();
+  }
+
+  function setupAiTurn(textEn, textKo, hints) {
+    document.getElementById('aiSpeechText').textContent = textEn;
+    document.getElementById('aiSubText').textContent = textKo;
+    document.getElementById('aiSubText').style.display = "none";
+
+    // Setup Hints
+    document.getElementById('hintWords').textContent = (hints && hints.words) ? hints.words.join(', ') : "iced latte, decaf";
+    document.getElementById('hintStarter').textContent = (hints && hints.starter) ? hints.starter : "Could you make that...";
+    document.getElementById('hintFull').textContent = (hints && hints.full) ? hints.full : "Could you make that decaf, please?";
+
+    // Reset User Input UI
+    document.getElementById('userTranscriptBox').innerHTML = '<span class="placeholder-pulse">하단 마이크를 누르고 영어로 말해보세요 🎙️</span>';
+    document.getElementById('feedbackContainer').style.display = "none";
+    document.getElementById('feedbackContainer').innerHTML = "";
+    document.getElementById('konglishBanner').style.display = "none";
+    document.getElementById('btnNextTurn').style.display = "none";
+    document.getElementById('btnMic').style.display = "inline-flex";
+    document.getElementById('hintDrawer').style.display = "none";
+
+    // Automatically Speak AI line
+    speakText(textEn);
+  }
+
+  function playAiSpeechAgain() {
+    const text = document.getElementById('aiSpeechText').textContent;
+    if (text) speakText(text);
+  }
+
+  function toggleKoreanTranslation() {
+    const sub = document.getElementById('aiSubText');
+    sub.style.display = (sub.style.display === "none") ? "block" : "none";
+  }
+
+  function toggleHintDrawer() {
+    const drawer = document.getElementById('hintDrawer');
+    drawer.style.display = (drawer.style.display === "none") ? "flex" : "none";
+    playClickSound();
+  }
+
+  function updateSessionProgress(turnIndex) {
+    const pct = (turnIndex / 3) * 100;
+    document.getElementById('sessionProgressFill').style.width = pct + "%";
+  }
+
+  // -------------------------------------------------------------
+  // 5. SPEECH RECOGNITION (0ms Instant STT)
+  // -------------------------------------------------------------
+  function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn("SpeechRecognition not supported in this browser");
+      return;
+    }
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = function() {
+      isRecording = true;
+      document.getElementById('btnMic').classList.add('recording');
+      document.getElementById('micBtnIcon').textContent = "⏹️";
+      document.getElementById('micBtnText').textContent = "듣고 있어요...";
+      document.getElementById('userTranscriptBox').classList.add('recording');
+      startWaveformSimulation();
+    };
+
+    recognition.onresult = function(event) {
+      let interim = '';
+      let final = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      const text = final || interim;
+      if (text) {
+        document.getElementById('userTranscriptBox').innerHTML = `<span style="color:#FFFFFF; font-weight:800;">${text}</span>`;
+        checkKonglishRealtime(text);
+      }
+    };
+
+    recognition.onerror = function(err) {
+      console.error("STT Error:", err);
+      stopRecordingUI();
+      showToast("마이크 음성을 감지하지 못했습니다. 다시 시도해 주세요.");
+    };
+
+    recognition.onend = function() {
+      stopRecordingUI();
+      const userText = document.getElementById('userTranscriptBox').innerText.trim();
+      if (userText && userText !== "하단 마이크를 누르고 영어로 말해보세요 🎙️") {
+        processUserSpeechWithGemini(userText);
+      }
+    };
+  }
+
+  function toggleSpeechRecognition() {
+    if (!recognition) {
+      // Fallback prompt for text input if mic API is unsupported
+      const manual = prompt("브라우저 마이크를 지원하지 않습니다. 영어로 문장을 입력해 보세요:");
+      if (manual) processUserSpeechWithGemini(manual);
+      return;
+    }
+
+    if (isRecording) {
+      recognition.stop();
+    } else {
+      try {
+        recognition.start();
+      } catch(e) {
+        recognition.stop();
+      }
+    }
+  }
+
+  function stopRecordingUI() {
+    isRecording = false;
+    document.getElementById('btnMic').classList.remove('recording');
+    document.getElementById('micBtnIcon').textContent = "🎙️";
+    document.getElementById('micBtnText').textContent = "터치하고 말하기";
+    document.getElementById('userTranscriptBox').classList.remove('recording');
+    stopWaveformSimulation();
+  }
+
+  // -------------------------------------------------------------
+  // 6. KONGLISH RADAR (Real-time Koreanism Detector)
+  // -------------------------------------------------------------
+  function checkKonglishRealtime(text) {
+    const lower = text.toLowerCase();
+    for (const [key, val] of Object.entries(KONGLISH_DICT)) {
+      if (lower.includes(key)) {
+        const banner = document.getElementById('konglishBanner');
+        document.getElementById('konglishText').innerHTML = `<b>${val.ko} (${key})</b> 감지! 원어민 표현 ➔ <b>${val.native}</b>`;
+        banner.style.display = "flex";
+        playWarningSound();
+        return;
+      }
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 7. GEMINI 3.6 FLASH API CALLER & 3-TIER PARAPHRASING
+  // -------------------------------------------------------------
+  async function processUserSpeechWithGemini(userUtterance) {
+    showToast("Gemini 3.6 Flash가 분석 중입니다... 🧠");
+    const apiKey = localStorage.getItem('duospeak_api_key') || DEFAULT_GEMINI_KEY;
+    const model = localStorage.getItem('duospeak_model') || DEFAULT_GEMINI_MODEL;
+    const lvl = currentProfile.level || 1;
+
+    const prompt = `You are a native English conversation tutor for a Korean student at CEFR Level ${lvl}/10.
+Current scenario role: "${currentStage.role || 'Partner'}" in situation "${currentStage.title}".
+The previous AI line was: "${document.getElementById('aiSpeechText').textContent}".
+The student just said: "${userUtterance}".
+
+Respond strictly with a JSON object (no markdown, no code block backticks) with this exact schema:
+{
+  "nextAiReply": "Your natural in-character conversational next line in English (keep it within 1-2 sentences appropriate for level ${lvl})",
+  "nextAiReplyKo": "Korean translation of nextAiReply",
+  "grammarFix": "Corrected user's utterance if there was a grammar error, otherwise state 'Perfect grammar!'",
+  "nativeWay": "How a real native speaker would say what the user meant (natural idiom/collocation)",
+  "casualSlang": "A casual or trendy slang alternative",
+  "hintsForStudent": {
+    "words": ["keyword1", "keyword2"],
+    "starter": "Suggested sentence beginning...",
+    "full": "Complete model response sentence..."
+  }
+}`;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const payload = {
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.4, maxOutputTokens: 1024 }
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      
+      let rawText = data.candidates[0].content.parts[0].text.trim();
+      if (rawText.startsWith("```json")) rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+      else if (rawText.startsWith("```")) rawText = rawText.replace(/```/g, "").trim();
+      
+      const parsed = JSON.parse(rawText);
+      renderFeedbackAndNextTurn(userUtterance, parsed);
+    } catch(err) {
+      console.error("Gemini Error:", err);
+      // Friendly fallback so user flow is never broken
+      const fallback = {
+        nextAiReply: "That sounds wonderful! What do you want to do next?",
+        nextAiReplyKo: "좋은 생각이네요! 다음엔 뭘 하고 싶으신가요?",
+        grammarFix: userUtterance,
+        nativeWay: "Sounds like a solid plan!",
+        casualSlang: "I'm down for that!",
+        hintsForStudent: { words: ["Sounds good", "Let's go"], starter: "I think we should...", full: "Sounds good to me, let's do it!" }
+      };
+      renderFeedbackAndNextTurn(userUtterance, fallback);
+    }
+  }
+
+  function renderFeedbackAndNextTurn(originalText, res) {
+    playCorrectChime();
+    addXp(15);
+
+    // Render 3-Tier Native Feedback Cards
+    const container = document.getElementById('feedbackContainer');
+    container.innerHTML = `
+      <div class="fb-card grammar">
+        <div class="fb-tag"><span>🟢 문법 교정 (Grammar)</span></div>
+        <div class="fb-body">${res.grammarFix}</div>
+      </div>
+      <div class="fb-card native">
+        <div class="fb-tag">
+          <span>🔵 원어민 추천 찰진 표현 (Native Way)</span>
+          <button class="bubble-btn" style="color:#FFFFFF; border-color:var(--accent-blue);" onclick="bookmarkExpression('${escapeQuotes(originalText)}', '${escapeQuotes(res.nativeWay)}')">★ 북마크</button>
+        </div>
+        <div class="fb-body">${res.nativeWay}</div>
+      </div>
+      <div class="fb-card slang">
+        <div class="fb-tag"><span>🟣 캐주얼 / 슬랭 (Casual)</span></div>
+        <div class="fb-body">${res.casualSlang}</div>
+      </div>
+    `;
+    container.style.display = "flex";
+
+    // Prepare next turn
+    window._pendingNextTurn = {
+      textEn: res.nextAiReply,
+      textKo: res.nextAiReplyKo,
+      hints: res.hintsForStudent
+    };
+
+    document.getElementById('btnMic').style.display = "none";
+    document.getElementById('btnNextTurn').style.display = "inline-flex";
+  }
+
+  function proceedNextTurn() {
+    currentTurn++;
+    updateSessionProgress(currentTurn);
+
+    if (currentTurn >= 3) {
+      // Stage Cleared!
+      completeStage();
+    } else {
+      if (window._pendingNextTurn) {
+        setupAiTurn(window._pendingNextTurn.textEn, window._pendingNextTurn.textKo, window._pendingNextTurn.hints);
+      }
+    }
+  }
+
+  function completeStage() {
+    playCompleteFanfare();
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+    if (!currentProfile.completed.includes(currentStage.id)) {
+      currentProfile.completed.push(currentStage.id);
+      currentProfile.streak += 1;
+      currentProfile.xp += 50;
+      saveProfiles();
+    }
+
+    updateHeaderStats();
+    renderMapNodes();
+
+    setTimeout(() => {
+      alert(`🎉 스테이지 클리어!\n\n오늘의 3분 미션을 성공적으로 완료했습니다!\n🔥 연속 학습: ${currentProfile.streak}일 달성\n⚡ 획득 경험치: +50 XP`);
+      document.getElementById('sessionView').classList.remove('active');
+    }, 1200);
+  }
+
+  function confirmExitSession() {
+    if (confirm("정말 학습을 중단하고 나가시겠습니까?")) {
+      document.getElementById('sessionView').classList.remove('active');
+      stopRecordingUI();
+      speechSynth.cancel();
+    }
+  }
+
+  function bookmarkExpression(original, native) {
+    if (!currentProfile.bookmarks) currentProfile.bookmarks = [];
+    currentProfile.bookmarks.unshift({
+      id: "bm_" + Date.now(),
+      date: new Date().toLocaleDateString(),
+      original: original,
+      native: native
+    });
+    saveProfiles();
+    playClickSound();
+    showToast("내 오답장에 저장되었습니다! ★");
+  }
+
+  // -------------------------------------------------------------
+  // 8. TEXT-TO-SPEECH (TTS) & WEB AUDIO
+  // -------------------------------------------------------------
+  let audioCtx = null;
+  function initWebAudio() {
+    try {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+    } catch(e) {}
+  }
+
+  function speakText(text) {
+    if (!speechSynth) return;
+    speechSynth.cancel();
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    
+    // Choose natural English voice if available
+    const voices = speechSynth.getVoices();
+    const usVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes("Samantha") || v.name.includes("Natural") || v.name.includes("Google")));
+    if (usVoice) utter.voice = usVoice;
+
+    const speed = parseFloat(localStorage.getItem('duospeak_voice_speed') || '1.0');
+    utter.rate = speed;
+
+    speechSynth.speak(utter);
+  }
+
+  // Chime Sound Effects
+  function playCorrectChime() {
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+        gain.gain.setValueAtTime(0.2, now + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.08);
+        osc.stop(now + i * 0.08 + 0.26);
+      });
+    } catch(e) {}
+  }
+
+  function playChime() {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    } catch(e) {}
+  }
+
+  function playCompleteFanfare() {
+    if (!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, now + i * 0.1);
+        gain.gain.setValueAtTime(0.25, now + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.1);
+        osc.stop(now + i * 0.1 + 0.65);
+      });
+    } catch(e) {}
+  }
+
+  function playClickSound() {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.06);
+    } catch(e) {}
+  }
+
+  function playWarningSound() {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.22);
+    } catch(e) {}
+  }
+
+  // Waveform Visualizer on Canvas
+  let waveAnimId = null;
+  function startWaveformSimulation() {
+    const canvas = document.getElementById('waveformCanvas');
+    const ctx = canvas.getContext('2d');
+    let step = 0;
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 2;
+
+      // Draw User Live Voice Curve (Green)
+      ctx.strokeStyle = "#58CC02";
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x++) {
+        const y = canvas.height / 2 + Math.sin((x + step * 4) * 0.05) * Math.sin(step * 0.1) * 12;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Draw Reference AI Pitch Curve (Blue dashed)
+      ctx.strokeStyle = "rgba(28, 176, 246, 0.4)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x++) {
+        const y = canvas.height / 2 + Math.sin(x * 0.04) * 8;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      step++;
+      waveAnimId = requestAnimationFrame(render);
+    }
+    render();
+  }
+
+  function stopWaveformSimulation() {
+    if (waveAnimId) cancelAnimationFrame(waveAnimId);
+    const canvas = document.getElementById('waveformCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // -------------------------------------------------------------
+  // 9. PROFILE & SETTINGS MODALS
+  // -------------------------------------------------------------
+  function openProfileModal() {
+    renderProfileList();
+    document.getElementById('profileModal').classList.add('active');
+    playClickSound();
+  }
+
+  function renderProfileList() {
+    const container = document.getElementById('profileListContainer');
+    container.innerHTML = "";
+
+    profiles.forEach(p => {
+      const isCurrent = (p.id === currentProfile.id);
+      const row = document.createElement('div');
+      row.style.cssText = `
+        display: flex; justify-content: space-between; align-items: center;
+        background: ${isCurrent ? 'rgba(88,204,2,0.15)' : '#101B20'};
+        border: 2px solid ${isCurrent ? 'var(--primary)' : 'var(--card-border)'};
+        border-radius: 16px; padding: 12px 16px; cursor: pointer;
+      `;
+      row.onclick = () => switchProfile(p.id);
+
+      row.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 30px;">${p.avatar}</span>
+          <div>
+            <div style="font-weight: 800; font-size: 15px;">${p.name} ${isCurrent ? '<span style="color:var(--primary); font-size:12px;">(현재 사용 중)</span>' : ''}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Lv ${p.level} · 🔥 ${p.streak}일 연속 · ⚡ ${p.xp} XP</div>
+          </div>
+        </div>
+        <button class="btn-3d ${isCurrent ? 'btn-green' : 'btn-outline'}" style="padding: 6px 14px; font-size: 13px; border-radius: 10px;">
+          ${isCurrent ? '선택됨' : '전환'}
+        </button>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  function switchProfile(profileId) {
+    const target = profiles.find(p => p.id === profileId);
+    if (target) {
+      currentProfile = target;
+      saveProfiles();
+      updateHeaderStats();
+      renderMapNodes();
+      closeModal('profileModal');
+      playChime();
+      showToast(`${currentProfile.name} 님의 학습 맵으로 전환되었습니다! 🦉`);
+    }
+  }
+
+  let selectedAvatar = '🦉';
+  function selectAvatar(elem, avatarChar) {
+    document.querySelectorAll('#newAvatarPicker .avatar-opt').forEach(el => el.classList.remove('selected'));
+    elem.classList.add('selected');
+    selectedAvatar = avatarChar;
+    playClickSound();
+  }
+
+  function addNewProfile() {
+    const name = document.getElementById('newProfileName').value.trim();
+    if (!name) { alert("이름이나 별명을 입력해 주세요!"); return; }
+    const lvl = parseInt(document.getElementById('newProfileLevel').value);
+
+    const newProfile = {
+      id: "p_" + Date.now(),
+      name: name,
+      avatar: selectedAvatar,
+      level: lvl,
+      xp: 0,
+      streak: 1,
+      lastActive: new Date().toLocaleDateString(),
+      completed: [],
+      bookmarks: []
+    };
+
+    profiles.push(newProfile);
+    currentProfile = newProfile;
+    saveProfiles();
+
+    document.getElementById('newProfileName').value = "";
+    updateHeaderStats();
+    renderMapNodes();
+    closeModal('profileModal');
+    playCompleteFanfare();
+    showToast(`반가워요, ${name}님! 즐거운 회화를 시작해 볼까요? 🎉`);
+  }
+
+  function openSettingsModal() {
+    document.getElementById('inputGeminiApiKey').value = localStorage.getItem('duospeak_api_key') || DEFAULT_GEMINI_KEY;
+    document.getElementById('inputGeminiModel').value = localStorage.getItem('duospeak_model') || DEFAULT_GEMINI_MODEL;
+    document.getElementById('voiceSpeedSelect').value = localStorage.getItem('duospeak_voice_speed') || '1.0';
+    document.getElementById('settingsModal').classList.add('active');
+    playClickSound();
+  }
+
+  function saveSettings() {
+    const key = document.getElementById('inputGeminiApiKey').value.trim();
+    const speed = document.getElementById('voiceSpeedSelect').value;
+
+    localStorage.setItem('duospeak_api_key', key || DEFAULT_GEMINI_KEY);
+    localStorage.setItem('duospeak_voice_speed', speed);
+
+    closeModal('settingsModal');
+    playClickSound();
+    showToast("설정이 안전하게 저장되었습니다! ⚙️");
+  }
+
+  function openCustomScenarioModal() {
+    document.getElementById('customModal').classList.add('active');
+    playClickSound();
+  }
+
+  function launchCustomScenario() {
+    const title = document.getElementById('customScenarioInput').value.trim() || "자유 주제 회화";
+    const role = document.getElementById('customRoleInput').value.trim() || "친구";
+
+    closeModal('customModal');
+    currentStage = {
+      id: "custom_" + Date.now(),
+      title: title,
+      role: role,
+      firstLine: `Hey! Good to see you. How is everything going with ${title}?`,
+      firstLineKo: `안녕! 만나서 반가워. ${title} 관련해서 어떻게 되어가고 있어?`
+    };
+
+    currentTurn = 0;
+    document.getElementById('sessionView').classList.add('active');
+    document.getElementById('sessionHearts').textContent = "5";
+    updateSessionProgress(0);
+
+    setupAiTurn(currentStage.firstLine, currentStage.firstLineKo, {
+      words: ["Great", "Actually", "Thanks"],
+      starter: "It's going well, but...",
+      full: "It's going really well, thanks for asking!"
+    });
+  }
+
+  function switchNav(tabName) {
+    playClickSound();
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    if (tabName === 'vocab') {
+      openVocabModal();
+    } else if (tabName === 'learn') {
+      // Return to main map view
+    }
+  }
+
+  function openVocabModal() {
+    const container = document.getElementById('vocabListContainer');
+    container.innerHTML = "";
+    const list = currentProfile.bookmarks || [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; color: var(--text-muted); padding: 40px 10px;">
+          <div style="font-size: 40px; margin-bottom: 10px;">★</div>
+          <div>아직 저장된 오답이나 북마크 표현이 없습니다.<br>회화 중에 [★ 북마크]를 눌러보세요!</div>
+        </div>
+      `;
+    } else {
+      list.forEach(item => {
+        const card = document.createElement('div');
+        card.style.cssText = "background:#101B20; border:1px solid var(--card-border); border-radius:14px; padding:12px; display:flex; justify-content:space-between; align-items:center;";
+        card.innerHTML = `
+          <div>
+            <div style="font-size:14px; font-weight:800; color:var(--accent-blue);">${item.native}</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">내 원래 발화: "${item.original}"</div>
+          </div>
+          <button class="bubble-btn" onclick="speakText('${escapeQuotes(item.native)}')">🔊 듣기</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById('vocabModal').classList.add('active');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    playClickSound();
+  }
+
+  function addXp(amount) {
+    currentProfile.xp += amount;
+    saveProfiles();
+    updateHeaderStats();
+  }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('duoToast');
+    t.textContent = msg;
+    t.classList.add('active');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('active'), 2500);
+  }
+
+  function escapeQuotes(str) {
+    if (!str) return "";
+    return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+  }
+
+  // Start app on DOMContentLoaded
+  window.addEventListener('DOMContentLoaded', initApp);
+</script>
+
+</body>
+</html>
