@@ -396,6 +396,133 @@
       white-space: nowrap;
     }
 
+    /* Reading Tab & Shadowing Styles */
+    .dict-toggle-btn {
+      background: rgba(28, 176, 246, 0.15);
+      border: 1.5px solid var(--accent-blue);
+      color: var(--accent-blue);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .dict-toggle-btn:hover {
+      background: rgba(28, 176, 246, 0.25);
+    }
+    .lang-opt-card {
+      background: #101B20;
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .lang-opt-card:hover {
+      border-color: rgba(88, 204, 2, 0.5);
+    }
+    .lang-opt-card.selected {
+      border-color: var(--primary);
+      background: rgba(88, 204, 2, 0.15);
+    }
+    .filter-pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: #101B20;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .filter-pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .read-word {
+      display: inline-block;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 0 3px;
+      margin: 0 1px;
+      transition: all 0.12s ease;
+      color: inherit;
+    }
+    .read-word:hover {
+      background: rgba(28, 176, 246, 0.35);
+      color: #38bdf8;
+      text-decoration: underline;
+    }
+    .read-word.saved {
+      border-bottom: 2px solid var(--accent-yellow);
+    }
+    .read-sentence-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      transition: background 0.2s ease;
+    }
+    .read-sentence-row:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .read-sentence-row.active-reading {
+      background: rgba(28, 176, 246, 0.15);
+      box-shadow: 0 0 12px rgba(28, 176, 246, 0.2);
+    }
+    .read-sentence-row.selected-target {
+      background: rgba(88, 204, 2, 0.15);
+      border-left: 3px solid var(--primary);
+    }
+    .sentence-action-btn {
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 4px;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .sentence-action-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    .score-badge {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    .word-pill-correct {
+      display: inline-block;
+      background: rgba(88, 204, 2, 0.2);
+      color: #58CC02;
+      border: 1px solid rgba(88, 204, 2, 0.4);
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 3px;
+    }
+    .word-pill-missed {
+      display: inline-block;
+      background: rgba(255, 75, 75, 0.2);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 75, 75, 0.4);
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 3px;
+      text-decoration: line-through;
+    }
+
     /* Speaking Stage Screen (Session) */
     .session-view {
       position: fixed;
@@ -759,15 +886,127 @@
     </div>
   </main>
 
+  <!-- Reading & Shadowing View -->
+  <main class="reading-container" id="mainReadingView" style="display: none; padding: 20px 16px 90px; width: 100%; max-width: 540px; margin: 0 auto;">
+    <!-- Reading Header & Dict Language Indicator -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h2 style="font-size: 20px; font-weight: 900;">📖 레벨별 리딩 & 쉐도잉</h2>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+          원어민 음성 듣기 · 따라 읽고 발음 평가 · 단어 터치 즉시 사전
+        </p>
+      </div>
+      <button class="dict-toggle-btn" id="readingDictToggle" onclick="toggleProfileDictLang()" title="단어 설명 언어 전환">
+        사전: 🇰🇷 한국어
+      </button>
+    </div>
+
+    <!-- Article Catalog (List) -->
+    <div id="readingCatalogView">
+      <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px;">
+        <button class="filter-pill active" id="filterMy" onclick="filterReadingArticles('my')">⭐ 내 레벨 추천</button>
+        <button class="filter-pill" id="filterAll" onclick="filterReadingArticles('all')">전체</button>
+        <button class="filter-pill" id="filterBeg" onclick="filterReadingArticles('beg')">🌱 초급 (1~3)</button>
+        <button class="filter-pill" id="filterMid" onclick="filterReadingArticles('mid')">🌿 중급 (4~7)</button>
+        <button class="filter-pill" id="filterAdv" onclick="filterReadingArticles('adv')">🌳 고급 (8~10)</button>
+      </div>
+      <div id="articlesListContainer" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- Article Reader View -->
+    <div id="articleReaderView" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <button class="btn-3d btn-outline" style="padding: 6px 14px; font-size: 13px; border-radius: 12px;" onclick="closeArticleReader()">
+          ← 목록으로
+        </button>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="unit-badge" id="readerArticleBadge" style="margin-bottom: 0;">UNIT 1 · 입문</span>
+          <span style="font-size: 11px; color: var(--text-muted);" id="readerReadTime">2분</span>
+        </div>
+      </div>
+
+      <div class="article-card" style="background: #17242C; border: 2px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px;">
+        <h3 id="readerTitle" style="font-size: 19px; font-weight: 900; margin-bottom: 14px; line-height: 1.3; color: #fff;"></h3>
+        
+        <!-- Audio Read Aloud Player Bar -->
+        <div style="background: #101B20; border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn-3d btn-green" id="btnPlayAll" onclick="togglePlayFullArticle()" style="padding: 8px 14px; font-size: 12px; border-radius: 12px;">
+              ▶ 원어민 전체 듣기
+            </button>
+            <button class="btn-3d btn-outline" onclick="stopArticleAudio()" style="padding: 8px 12px; font-size: 12px; border-radius: 12px;" title="정지">
+              ⏹
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <span style="font-size: 11px; color: var(--text-muted);">배속:</span>
+            <select id="articleSpeedSelect" onchange="changeArticleAudioSpeed(this.value)" class="form-select" style="width: auto; padding: 4px 6px; font-size: 11px; border-radius: 8px;">
+              <option value="0.8">0.8x</option>
+              <option value="1.0" selected>1.0x</option>
+              <option value="1.2">1.2x</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="font-size: 12px; color: var(--accent-yellow); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; background: rgba(255,200,0,0.08); padding: 8px 12px; border-radius: 10px;">
+          <span>💡</span>
+          <span>단어를 터치하면 <strong>즉시 단어 설명</strong>이 뜨고 <strong>단어장에 등록</strong>할 수 있어요!</span>
+        </div>
+
+        <!-- Article Sentences Body -->
+        <div id="readerBody" style="font-size: 16px; line-height: 2.1; color: #E2E8F0;">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- Shadowing & Pronunciation Practice Section -->
+      <div id="shadowingSection" style="background: #131E24; border: 2px solid var(--accent-blue); border-radius: 20px; padding: 18px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+          <span style="font-size: 22px;">🎙️</span>
+          <div>
+            <div style="font-size: 14px; font-weight: 800; color: #fff;">따라 읽기 & 발음 점수 평가 (Shadowing)</div>
+            <div style="font-size: 11px; color: var(--text-muted);">문장을 선택하고 마이크를 눌러 소리 내어 읽어보세요.</div>
+          </div>
+        </div>
+
+        <!-- Target Sentence Box -->
+        <div id="shadowTargetBox" style="background: #0D161B; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; font-size: 15px; font-weight: 700; color: var(--accent-blue); line-height: 1.4;">
+          <!-- Sentence to shadow -->
+        </div>
+
+        <!-- User Spoken Result & Score Display -->
+        <div id="shadowScoreCard" style="display: none; background: #17242C; border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid rgba(88,204,2,0.3);">
+          <!-- Score + Word Comparison (Green = Correct, Red = Missed) -->
+        </div>
+
+        <!-- Shadowing Action Buttons -->
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-3d btn-blue" id="btnListenTarget" onclick="listenTargetSentence()" style="flex: 1; padding: 12px; font-size: 13px; border-radius: 14px;">
+            🔊 모범 발음 듣기
+          </button>
+          <button class="btn-3d btn-green" id="btnShadowMic" onclick="toggleShadowingMic()" style="flex: 2; padding: 12px; font-size: 14px; border-radius: 14px;">
+            🎙️ 따라 읽기 시작
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <!-- Bottom Nav Tabs -->
   <nav class="duo-nav">
-    <div class="nav-tab active" onclick="switchNav('learn')">
+    <div class="nav-tab active" id="tabLearn" onclick="switchNav('learn')">
       <span class="icon">🗺️</span>
       <span>학습 맵</span>
     </div>
-    <div class="nav-tab" onclick="switchNav('vocab')">
+    <div class="nav-tab" id="tabReading" onclick="switchNav('reading')">
+      <span class="icon">📖</span>
+      <span>리딩</span>
+    </div>
+    <div class="nav-tab" id="tabVocab" onclick="switchNav('vocab')">
       <span class="icon">★</span>
-      <span>내 오답장</span>
+      <span>단어장</span>
     </div>
     <div class="nav-tab" onclick="openProfileModal()">
       <span class="icon">👥</span>
@@ -919,6 +1158,24 @@
         <div class="level-select-grid" id="welcomeLevelGrid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
           <!-- Injected by JS -->
         </div>
+      <!-- Step 4: Unknown Word Explanation Language -->
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+          <span style="background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">4</span>
+          모르는 단어 사전 설명 방식
+        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="lang-opt-card selected" id="welcomeLangKo" onclick="selectWelcomeDictLang('ko')">
+            <div style="font-size: 24px; margin-bottom: 4px;">🇰🇷</div>
+            <div style="font-weight: 800; font-size: 13px; color: #fff;">한국어로 설명</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">직관적이고 빠른 이해</div>
+          </div>
+          <div class="lang-opt-card" id="welcomeLangEn" onclick="selectWelcomeDictLang('en')">
+            <div style="font-size: 24px; margin-bottom: 4px;">🇺🇸</div>
+            <div style="font-weight: 800; font-size: 13px; color: #fff;">영어로 설명</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">원어민식 쉬운 풀이</div>
+          </div>
+        </div>
       </div>
 
       <button class="btn-3d btn-green" style="width: 100%; padding: 14px; font-size: 16px; border-radius: 16px; margin-top: 6px;" onclick="createFirstProfile()">
@@ -998,6 +1255,13 @@
             <option value="9">Lv 9. 현지 원어민 슬랭 & 관용구 (C1-Mid)</option>
             <option value="10">Lv 10. 프로페셔널 비즈니스 & 토론 (C1-High)</option>
           </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">단어 사전 설명 방식</label>
+        <select id="newProfileDictLang" class="form-select">
+          <option value="ko" selected>🇰🇷 한국어로 설명 (영한 사전)</option>
+          <option value="en">🇺🇸 영어로 설명 (영영 사전)</option>
         </select>
       </div>
       <button class="btn-3d btn-green" style="width: 100%; border-radius: 16px;" onclick="addNewProfile()">
@@ -1092,6 +1356,48 @@
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 📖 MODAL: Word Dictionary & Bookmark       -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="wordDetailModal" style="z-index: 1200;">
+  <div class="modal-card" style="max-width: 420px;">
+    <div class="modal-header" style="margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 24px;">📖</span>
+        <h3 class="modal-title" id="wordModalTitle" style="font-size: 22px;">Word</h3>
+        <span id="wordModalIpa" style="font-size: 13px; color: var(--text-muted);"></span>
+      </div>
+      <button class="btn-close" onclick="closeModal('wordDetailModal')">✕</button>
+    </div>
+
+    <!-- Audio pronounce button & Lang switch -->
+    <div style="margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
+      <button class="btn-3d btn-outline" style="padding: 6px 12px; font-size: 12px; border-radius: 10px;" onclick="speakCurrentWord()">
+        🔊 발음 듣기
+      </button>
+      <button class="btn-3d btn-outline" id="btnToggleWordLang" style="padding: 6px 12px; font-size: 11px; border-radius: 10px;" onclick="toggleCurrentWordLang()">
+        🌐 설명 언어 전환
+      </button>
+    </div>
+
+    <!-- Definition Container -->
+    <div style="background: #101B20; border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid var(--card-border);">
+      <div style="font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 6px;" id="wordDefTypeBadge">
+        🇰🇷 한국어 설명
+      </div>
+      <div id="wordModalDefinition" style="font-size: 15px; font-weight: 700; color: #FFFFFF; line-height: 1.4;">
+      </div>
+      <div id="wordModalExample" style="font-size: 12px; color: var(--text-muted); margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1);">
+      </div>
+    </div>
+
+    <!-- Add to Vocab Button -->
+    <button class="btn-3d btn-green" id="btnSaveWordToDeck" style="width: 100%; border-radius: 16px; padding: 12px; font-size: 14px;" onclick="saveCurrentWordToDeck()">
+      ★ 내 단어장에 등록하기
+    </button>
+  </div>
+</div>
+
 <div class="duo-toast" id="duoToast">알림 메시지</div>
 
 <!-- ========================================== -->
@@ -1174,6 +1480,255 @@
   };
 
   // -------------------------------------------------------------
+  // 1.5 READING & SHADOWING ARTICLES DATABASE (10 LEVELS)
+  // -------------------------------------------------------------
+  const READING_ARTICLES = [
+    {
+      id: "art-1",
+      level: 1,
+      badge: "UNIT 1 · 입문",
+      category: "☕ 카페 & 일상",
+      title: "A Cozy Morning at the Corner Cafe",
+      readTime: "2분",
+      sentences: [
+        "I wake up early on Saturday morning.",
+        "The sun is warm and the sky is blue.",
+        "I walk to a small cafe near my house.",
+        "It is a very cozy and pleasant place.",
+        "I order a hot coffee and a sweet bread.",
+        "The smell of fresh coffee makes me very happy."
+      ],
+      vocab: {
+        "cozy": { ipa: "/ˈkoʊ.zi/", en: "Warm, comfortable, and pleasant in a gentle way.", ko: "아늑하고 포근하며 편안한" },
+        "warm": { ipa: "/wɔːrm/", en: "Having a comfortable degree of heat.", ko: "따뜻한, 온화한" },
+        "fresh": { ipa: "/freʃ/", en: "Recently made, produced, or gathered.", ko: "신선한, 갓 구운" },
+        "early": { ipa: "/ˈɜːr.li/", en: "Before the usual or expected time.", ko: "일찍, 이른 아침에" },
+        "sweet": { ipa: "/swiːt/", en: "Having a pleasant taste like sugar.", ko: "달콤한, 기분 좋은" }
+      }
+    },
+    {
+      id: "art-2",
+      level: 2,
+      badge: "UNIT 2 · 기초 문장",
+      category: "🏃 운동 & 루틴",
+      title: "My Weekend Running Habit",
+      readTime: "2분",
+      sentences: [
+        "Every Sunday, I put on my running shoes.",
+        "Running in the park gives me great energy.",
+        "The cool morning breeze feels amazing on my face.",
+        "I usually run for thirty minutes without stopping.",
+        "After finishing, I feel strong and refreshed for the new week."
+      ],
+      vocab: {
+        "breeze": { ipa: "/briːz/", en: "A light, gentle, and refreshing wind.", ko: "산들바람, 기분 좋은 가벼운 바람" },
+        "energy": { ipa: "/ˈen.ɚ.dʒi/", en: "The physical strength and vitality to do things.", ko: "활력, 기운, 에너지" },
+        "refreshed": { ipa: "/rɪˈfreʃt/", en: "Feeling clean, energetic, and full of new vigor.", ko: "상쾌해진, 기운을 북돋운" },
+        "habit": { ipa: "/ˈhæb.ɪt/", en: "A regular practice that is done repeatedly.", ko: "습관, 규칙적인 루틴" }
+      }
+    },
+    {
+      id: "art-3",
+      level: 3,
+      badge: "UNIT 3 · 생존 실전",
+      category: "🍕 식당 & 여행",
+      title: "Ordering Food in New York City",
+      readTime: "3분",
+      sentences: [
+        "New York has thousands of delicious restaurants from every culture.",
+        "When you enter, the friendly host greets you with a bright smile.",
+        "You can politely ask for a quiet table near the window.",
+        "Remember to inform the server if you have any food allergies.",
+        "Splitting the bill with friends is very common and convenient."
+      ],
+      vocab: {
+        "delicious": { ipa: "/dɪˈlɪʃ.əs/", en: "Highly pleasing and enjoyable to taste.", ko: "대단히 맛있는, 풍미 있는" },
+        "allergies": { ipa: "/ˈæl.ɚ.dʒiz/", en: "Damaging immune responses to particular substances.", ko: "알레르기, 특정 음식 거부반응" },
+        "splitting": { ipa: "/ˈsplɪt.ɪŋ/", en: "Dividing an expense equally among members.", ko: "더치페이하기, 분할 계산하기" },
+        "convenient": { ipa: "/kənˈviː.ni.ənt/", en: "Fitting in well with a person's needs or comfort.", ko: "편리한, 다루기 쉬운" }
+      }
+    },
+    {
+      id: "art-4",
+      level: 4,
+      badge: "UNIT 4 · 일상 스몰토크",
+      category: "🎾 테니스 & 스포츠",
+      title: "Playing Tennis: The Ultimate Workout",
+      readTime: "3분",
+      sentences: [
+        "Tennis is both an intense physical workout and a fast mental chess match.",
+        "You need agile footwork and a sharp focus on the spinning ball.",
+        "Hitting a clean, powerful forehand stroke feels incredibly satisfying.",
+        "Rallying with a supportive partner builds deep camaraderie and endurance.",
+        "Even when you lose a tight match, you still celebrate the exercise."
+      ],
+      vocab: {
+        "agile": { ipa: "/ˈædʒ.aɪl/", en: "Able to move quickly, easily, and precisely.", ko: "민첩한, 날렵한" },
+        "satisfying": { ipa: "/ˈsæt̬.ɪs.faɪ.ɪŋ/", en: "Giving a deep sense of fulfillment or joy.", ko: "짜릿하게 만족스러운, 통쾌한" },
+        "camaraderie": { ipa: "/ˌkɑːm.əˈrɑː.dɚ.i/", en: "Mutual trust and friendship among companions.", ko: "동료애, 끈끈한 우정" },
+        "endurance": { ipa: "/ɪnˈdʊr.əns/", en: "The ability to withstand hardships or physical stress.", ko: "지구력, 끈기" }
+      }
+    },
+    {
+      id: "art-5",
+      level: 5,
+      badge: "UNIT 5 · 경험 묘사",
+      category: "✈️ 공항 & 여정",
+      title: "Navigating the Busy International Airport",
+      readTime: "3분",
+      sentences: [
+        "International airports can feel overwhelming for first-time travelers.",
+        "The first crucial step is locating your airline check-in terminal.",
+        "Always keep your valid passport and digital boarding pass readily accessible.",
+        "Security personnel will inspect your electronic devices and carry-on baggage.",
+        "Once you arrive safely at your departure gate, you can finally relax."
+      ],
+      vocab: {
+        "overwhelming": { ipa: "/ˌoʊ.vɚˈwel.mɪŋ/", en: "Very great in amount, strength, or emotional effect.", ko: "압도적인, 정신없이 바쁜" },
+        "crucial": { ipa: "/ˈkruː.ʃəl/", en: "Decisive or critical, especially in the success of something.", ko: "결정적인, 중대한" },
+        "accessible": { ipa: "/əkˈses.ə.bəl/", en: "Easily reached, obtained, or approached.", ko: "손쉽게 꺼낼 수 있는, 접근 가능한" },
+        "inspect": { ipa: "/ɪnˈspekt/", en: "To look at closely in order to assess condition or safety.", ko: "면밀히 검사하다, 점검하다" }
+      }
+    },
+    {
+      id: "art-6",
+      level: 6,
+      badge: "UNIT 6 · 뉘앙스 교정",
+      category: "💡 대화법 & 심리",
+      title: "The Art of Engaging Small Talk",
+      readTime: "3분",
+      sentences: [
+        "Many people secretly dread spontaneous small talk with strangers.",
+        "However, effortless conversation is the doorway to genuine friendship.",
+        "Instead of closed questions, try asking open-ended questions with curiosity.",
+        "Listen with empathetic ears rather than preparing your next response.",
+        "A thoughtful inquiry about someone's hobby can ignite a memorable chat."
+      ],
+      vocab: {
+        "dread": { ipa: "/dred/", en: "To anticipate something with great apprehension or fear.", ko: "두려워하다, 부담스러워하다" },
+        "spontaneous": { ipa: "/spɑːnˈteɪ.ni.əs/", en: "Performed or occurring as a result of sudden impulse.", ko: "자발적인, 즉흥적인" },
+        "empathetic": { ipa: "/ˌem.pəˈθet̬.ɪk/", en: "Showing an ability to understand another person's feelings.", ko: "공감하는, 배려심 있는" },
+        "ignite": { ipa: "/ɪɡˈnaɪt/", en: "To catch fire or cause passionate interest to start.", ko: "불을 붙이다, 촉발하다" }
+      }
+    },
+    {
+      id: "art-7",
+      level: 7,
+      badge: "UNIT 7 · 문제 해결",
+      category: "🚨 여행 & 트러블슈팅",
+      title: "Overcoming Unexpected Travel Mishaps",
+      readTime: "4분",
+      sentences: [
+        "No matter how meticulously you plan, unexpected travel surprises always arise.",
+        "Flight cancellations, misplaced luggage, and unfamiliar transit systems test your patience.",
+        "The golden rule is keeping an adaptable attitude and clear communication.",
+        "Politely articulating your predicament often inspires hotel staff to go above and beyond.",
+        "In retrospect, sudden detours and hardships become our most cherished life stories."
+      ],
+      vocab: {
+        "meticulously": { ipa: "/məˈtɪk.jə.ləs.li/", en: "In a way that shows great attention to every small detail.", ko: "꼼꼼하게, 빈틈없이" },
+        "predicament": { ipa: "/prəˈdɪk.ə.mənt/", en: "A difficult, perplexing, or troublesome situation.", ko: "곤경, 난처한 상황" },
+        "retrospect": { ipa: "/ˈret.rə.spekt/", en: "A survey or review of a past course of events or period.", ko: "회고, 지나고 나서 돌이켜봄" },
+        "cherished": { ipa: "/ˈtʃer.ɪʃt/", en: "Protected and cared for lovingly; highly valued.", ko: "소중히 간직한, 아끼는" }
+      }
+    },
+    {
+      id: "art-8",
+      level: 8,
+      badge: "UNIT 8 · 논리적 의견",
+      category: "🧠 자기계발 & 습관",
+      title: "The Psychology of Habit Stacking",
+      readTime: "4분",
+      sentences: [
+        "Transforming personal habits rarely happens through overnight leaps of willpower.",
+        "Behavioral scientists recommend habit stacking: tying a new intention to an existing trigger.",
+        "For instance, reviewing three conversational idioms while sipping your morning espresso.",
+        "Over consecutive weeks, compound interest quietly elevates your linguistic intuition.",
+        "Relentless consistency inevitably triumphs over erratic bursts of enthusiasm."
+      ],
+      vocab: {
+        "willpower": { ipa: "/ˈwɪlˌpaʊ.ɚ/", en: "Control exerted to do something or restrain impulses.", ko: "의지력, 정신력" },
+        "compound": { ipa: "/ˈkɑːm.paʊnd/", en: "To make up a sum by combining multiple accretions.", ko: "복리로 늘어나는, 누적되는" },
+        "intuition": { ipa: "/ˌɪn.tuːˈɪʃ.ən/", en: "The ability to understand something instinctively.", ko: "직관력, 감각" },
+        "erratic": { ipa: "/ɪˈræt̬.ɪk/", en: "Not even or regular in pattern or movement; unpredictable.", ko: "불규칙한, 들쑥날쑥한" }
+      }
+    },
+    {
+      id: "art-9",
+      level: 9,
+      badge: "UNIT 9 · 원어민 관용구",
+      category: "🤖 AI & 기술 트렌드",
+      title: "How Conversational AI is Reshaping Fluency",
+      readTime: "4분",
+      sentences: [
+        "Language learning has historically been constrained by limited native speaker access.",
+        "Modern conversational artificial intelligence acts as an indefatigable speaking partner.",
+        "Learners can experiment with daring colloquialisms without lingering anxiety or social stigma.",
+        "Instant contextual paraphrasing bridges the gap between mechanical grammar and authentic cadence.",
+        "Those who leverage this synergy unlock global confidence far faster than traditional textbook crammers."
+      ],
+      vocab: {
+        "indefatigable": { ipa: "/ˌɪn.dɪˈfæt̬.ɪ.ɡə.bəl/", en: "Persisting tirelessly without becoming exhausted.", ko: "지칠 줄 모르는, 지치지 않는" },
+        "colloquialisms": { ipa: "/kəˈloʊ.kwi.ə.lɪ.zəmz/", en: "Words or phrases that are not formal, used in familiar chat.", ko: "구어체 표현, 일상 회화 관용구" },
+        "cadence": { ipa: "/ˈkeɪ.dəns/", en: "A modulation or inflection of the voice; rhythmic flow.", ko: "말의 억양, 자연스러운 리듬감" },
+        "synergy": { ipa: "/ˈsɪn.ɚ.dʒi/", en: "The interaction of elements producing a combined greater effect.", ko: "시너지, 상승효과" }
+      }
+    },
+    {
+      id: "art-10",
+      level: 10,
+      badge: "UNIT 10 · 비즈니스",
+      category: "💼 비즈니스 협상",
+      title: "Mastering the Subtle Art of Strategic Negotiation",
+      readTime: "4분",
+      sentences: [
+        "In elite international commerce, seasoned negotiators understand that concessions are not capitulation.",
+        "Skilled diplomats decipher the unstated aspirations underlying counterpart demands.",
+        "By aligning around mutual value creation rather than dogmatic postures, breakthroughs occur.",
+        "Articulate framing and judicious pauses effectively defuse high-stakes tension across borders.",
+        "Enduring partnerships are forged when both parties exit the boardroom feeling unequivocally victorious."
+      ],
+      vocab: {
+        "concessions": { ipa: "/kənˈseʃ.ənz/", en: "Things that are granted or ceded in response to demands.", ko: "양보, 절충안" },
+        "capitulation": { ipa: "/kəˌpɪtʃ.əˈleɪ.ʃən/", en: "The action of surrendering or ceasing to resist an opponent.", ko: "굴복, 항복" },
+        "dogmatic": { ipa: "/dɑːɡˈmæt̬.ɪk/", en: "Inclined to lay down principles as incontrovertibly true.", ko: "독단적인, 융통성 없는" },
+        "judicious": { ipa: "/dʒuːˈdɪʃ.əs/", en: "Having, showing, or done with good judgment or sense.", ko: "현명한, 신중한" },
+        "unequivocally": { ipa: "/ˌʌn.ɪˈkwɪv.ə.kəl.i/", en: "In a way that leaves no doubt; unambiguously.", ko: "명명백백하게, 확고히" }
+      }
+    }
+  ];
+
+  // Common Dictionary Fallback for Clickable Words
+  const COMMON_DICT = {
+    "morning": { ipa: "/ˈmɔːr.nɪŋ/", en: "The early part of the day from sunrise to noon.", ko: "아침, 오전" },
+    "house": { ipa: "/haʊs/", en: "A building for human habitation.", ko: "집, 주택" },
+    "small": { ipa: "/smɔːl/", en: "Little in size or amount.", ko: "작은, 아담한" },
+    "coffee": { ipa: "/ˈkɑː.fi/", en: "A hot drink made from roasted coffee beans.", ko: "커피" },
+    "bread": { ipa: "/bred/", en: "Food made of flour, water, and yeast, baked.", ko: "빵" },
+    "smell": { ipa: "/smel/", en: "The faculty of perceiving odors through the nose.", ko: "냄새, 향기" },
+    "happy": { ipa: "/ˈhæp.i/", en: "Feeling or showing pleasure or contentment.", ko: "행복한, 기쁜" },
+    "shoes": { ipa: "/ʃuːz/", en: "Coverings for feet, typically made of leather or rubber.", ko: "신발, 운동화" },
+    "park": { ipa: "/pɑːrk/", en: "A large public green area used for recreation.", ko: "공원" },
+    "face": { ipa: "/feɪs/", en: "The front part of a person's head.", ko: "얼굴" },
+    "strong": { ipa: "/strɑːŋ/", en: "Having the power to perform physically demanding tasks.", ko: "튼튼한, 강한" },
+    "host": { ipa: "/hoʊst/", en: "A person who receives or entertains guests.", ko: "안내 직원, 호스트" },
+    "smile": { ipa: "/smaɪl/", en: "A pleased, kind, or amused facial expression.", ko: "미소, 웃는 얼굴" },
+    "server": { ipa: "/ˈsɝː.vɚ/", en: "A waiter or waitress in a restaurant.", ko: "웨이터, 음식 서빙 직원" },
+    "bill": { ipa: "/bɪl/", en: "A printed statement of the money owed for goods or services.", ko: "계산서, 청구서" },
+    "partner": { ipa: "/ˈpɑːrt.nɚ/", en: "A person who takes part in an undertaking with another.", ko: "파트너, 동료" },
+    "match": { ipa: "/mætʃ/", en: "A contest in which people or teams compete against each other.", ko: "경기, 시합" },
+    "exercise": { ipa: "/ˈek.sɚ.saɪz/", en: "Activity requiring physical effort, done to sustain fitness.", ko: "운동, 신체 활동" },
+    "passport": { ipa: "/ˈpæs.pɔːrt/", en: "An official travel document certifying identity and nationality.", ko: "여권" },
+    "boarding": { ipa: "/ˈbɔːr.dɪŋ/", en: "The action of getting on or into a ship, aircraft, or vehicle.", ko: "탑승, 비행기 타기" },
+    "terminal": { ipa: "/ˈtɝː.mə.nəl/", en: "A departure and arrival building for passengers at an airport.", ko: "공항 터미널" },
+    "relax": { ipa: "/rɪˈlæks/", en: "Make or become less tense, anxious, or rigid.", ko: "휴식을 취하다, 긴장을 풀다" },
+    "friendship": { ipa: "/ˈfrend.ʃɪp/", en: "The emotions or conduct of friends; state of being friends.", ko: "우정, 친밀한 관계" },
+    "curiosity": { ipa: "/ˌkjʊr.iˈɑː.sə.t̬i/", en: "A strong desire to know or learn something.", ko: "호기심, 궁금증" },
+    "attitude": { ipa: "/ˈæt̬.ə.tuːd/", en: "A settled way of thinking or feeling about someone or something.", ko: "태도, 마음가짐" },
+    "routine": { ipa: "/ruːˈtiːn/", en: "A sequence of actions regularly followed; a fixed program.", ko: "일상적인 루틴, 고정된 습관" }
+  };
+
+  // -------------------------------------------------------------
   // 2. STATE & PROFILE MANAGEMENT
   // -------------------------------------------------------------
   let profiles = [];
@@ -1223,14 +1778,17 @@
 
   let welcomeSelectedAvatar = '🦉';
   let welcomeSelectedLevel = 1;
+  let welcomeSelectedDictLang = 'ko';
 
   function openWelcomeModal() {
     welcomeSelectedAvatar = '🦉';
     welcomeSelectedLevel = 1;
+    welcomeSelectedDictLang = 'ko';
     document.getElementById('welcomeProfileName').value = "";
     document.querySelectorAll('#welcomeAvatarPicker .avatar-opt').forEach(el => {
       el.classList.toggle('selected', el.innerText.trim() === '🦉');
     });
+    selectWelcomeDictLang('ko');
     renderWelcomeLevels();
     document.getElementById('welcomeModal').classList.add('active');
   }
@@ -1239,6 +1797,15 @@
     document.querySelectorAll('#welcomeAvatarPicker .avatar-opt').forEach(el => el.classList.remove('selected'));
     elem.classList.add('selected');
     welcomeSelectedAvatar = avatarChar;
+    playClickSound();
+  }
+
+  function selectWelcomeDictLang(lang) {
+    welcomeSelectedDictLang = lang;
+    const koCard = document.getElementById('welcomeLangKo');
+    const enCard = document.getElementById('welcomeLangEn');
+    if (koCard) koCard.classList.toggle('selected', lang === 'ko');
+    if (enCard) enCard.classList.toggle('selected', lang === 'en');
     playClickSound();
   }
 
@@ -1286,6 +1853,7 @@
       name: name,
       avatar: welcomeSelectedAvatar,
       level: welcomeSelectedLevel,
+      dictLang: welcomeSelectedDictLang || 'ko',
       xp: 0,
       streak: 1,
       lastActive: new Date().toLocaleDateString(),
@@ -1381,6 +1949,22 @@
 
     const banner = document.getElementById('unitBanner');
     banner.className = "unit-banner " + (lvl <= 3 ? "lv-green" : (lvl <= 7 ? "" : "lv-purple"));
+
+    // Update Dict Lang toggle button
+    const dictToggleBtn = document.getElementById('readingDictToggle');
+    if (dictToggleBtn) {
+      const isEn = (currentProfile && currentProfile.dictLang === 'en');
+      dictToggleBtn.textContent = isEn ? "사전: 🇺🇸 영어 (영영)" : "사전: 🇰🇷 한국어 (영한)";
+    }
+  }
+
+  function toggleProfileDictLang() {
+    if (!currentProfile) return;
+    currentProfile.dictLang = (currentProfile.dictLang === 'en') ? 'ko' : 'en';
+    saveProfiles();
+    updateHeaderStats();
+    playClickSound();
+    showToast(`단어 사전 설명이 [${currentProfile.dictLang === 'en' ? '영영(영어)' : '영한(한국어)'}] 모드로 변경되었습니다.`);
   }
 
   // -------------------------------------------------------------
@@ -2007,11 +2591,14 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     if (!name) { alert("이름이나 별명을 입력해 주세요!"); return; }
     const lvl = parseInt(document.getElementById('newProfileLevel').value);
 
+    const dictLang = document.getElementById('newProfileDictLang') ? document.getElementById('newProfileDictLang').value : 'ko';
+
     const newProfile = {
       id: "p_" + Date.now(),
       name: name,
       avatar: selectedAvatar,
       level: lvl,
+      dictLang: dictLang,
       xp: 0,
       streak: 1,
       lastActive: new Date().toLocaleDateString(),
@@ -2081,46 +2668,574 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     });
   }
 
+  // -------------------------------------------------------------
+  // 10. READING, SHADOWING & VOCABULARY ENGINE
+  // -------------------------------------------------------------
+  let currentReadingFilter = 'my';
+  let currentArticle = null;
+  let selectedShadowIndex = 0;
+  let isPlayingArticle = false;
+  let articleAudioIndex = 0;
+  let articleAudioSpeed = 1.0;
+  let shadowRecognition = null;
+  let isShadowRecording = false;
+  let currentLookupData = null;
+
   function switchNav(tabName) {
     playClickSound();
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    event.currentTarget.classList.add('active');
 
-    if (tabName === 'vocab') {
+    const tabLearn = document.getElementById('tabLearn');
+    const tabReading = document.getElementById('tabReading');
+    const tabVocab = document.getElementById('tabVocab');
+    const mainMapView = document.getElementById('mainMapView');
+    const mainReadingView = document.getElementById('mainReadingView');
+
+    if (tabName === 'learn') {
+      if (tabLearn) tabLearn.classList.add('active');
+      if (mainMapView) mainMapView.style.display = "flex";
+      if (mainReadingView) mainReadingView.style.display = "none";
+      stopArticleAudio();
+    } else if (tabName === 'reading') {
+      if (tabReading) tabReading.classList.add('active');
+      if (mainMapView) mainMapView.style.display = "none";
+      if (mainReadingView) mainReadingView.style.display = "block";
+      filterReadingArticles(currentReadingFilter || 'my');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tabName === 'vocab') {
+      if (tabVocab) tabVocab.classList.add('active');
       openVocabModal();
-    } else if (tabName === 'learn') {
-      // Return to main map view
     }
+  }
+
+  function filterReadingArticles(type) {
+    currentReadingFilter = type;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    const pill = document.getElementById(
+      type === 'my' ? 'filterMy' :
+      (type === 'all' ? 'filterAll' :
+      (type === 'beg' ? 'filterBeg' :
+      (type === 'mid' ? 'filterMid' : 'filterAdv')))
+    );
+    if (pill) pill.classList.add('active');
+
+    const curLvl = currentProfile ? (currentProfile.level || 1) : 1;
+    let filtered = READING_ARTICLES;
+
+    if (type === 'my') {
+      filtered = READING_ARTICLES.filter(a => a.level === curLvl);
+      if (filtered.length === 0) filtered = [READING_ARTICLES[0]];
+    } else if (type === 'beg') {
+      filtered = READING_ARTICLES.filter(a => a.level >= 1 && a.level <= 3);
+    } else if (type === 'mid') {
+      filtered = READING_ARTICLES.filter(a => a.level >= 4 && a.level <= 7);
+    } else if (type === 'adv') {
+      filtered = READING_ARTICLES.filter(a => a.level >= 8 && a.level <= 10);
+    }
+
+    renderReadingCatalog(filtered);
+    playClickSound();
+  }
+
+  function renderReadingCatalog(articles) {
+    const container = document.getElementById('articlesListContainer');
+    if (!container) return;
+    container.innerHTML = "";
+
+    articles.forEach(art => {
+      const card = document.createElement('div');
+      card.style.cssText = `
+        background: #17242C; border: 2px solid var(--card-border); border-radius: 20px;
+        padding: 16px 18px; cursor: pointer; transition: all 0.15s ease;
+      `;
+      card.onmouseenter = () => card.style.borderColor = "var(--accent-blue)";
+      card.onmouseleave = () => card.style.borderColor = "var(--card-border)";
+      card.onclick = () => openArticle(art.id);
+
+      const badgeColor = (art.level <= 3) ? 'var(--primary)' : (art.level <= 7 ? 'var(--accent-blue)' : 'var(--accent-purple)');
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="unit-badge" style="background:${badgeColor}; color:#fff; margin-bottom:0;">Lv ${art.level} · ${art.badge}</span>
+            <span style="font-size: 11px; color: var(--text-muted);">${art.category}</span>
+          </div>
+          <span style="font-size: 11px; color: var(--text-muted);">${art.readTime}</span>
+        </div>
+        <div style="font-size: 16px; font-weight: 800; color: #FFFFFF; margin-bottom: 6px;">
+          ${art.title}
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          ${art.sentences[0]} ${art.sentences[1]}
+        </div>
+        <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+          <button class="btn-3d btn-blue" style="padding: 6px 14px; font-size: 12px; border-radius: 10px;">
+            📖 리딩 & 쉐도잉 시작 ➔
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function openArticle(articleId) {
+    const art = READING_ARTICLES.find(a => a.id === articleId);
+    if (!art) return;
+    currentArticle = art;
+    selectedShadowIndex = 0;
+
+    document.getElementById('readingCatalogView').style.display = "none";
+    document.getElementById('articleReaderView').style.display = "block";
+
+    document.getElementById('readerTitle').textContent = art.title;
+    document.getElementById('readerArticleBadge').textContent = `Lv ${art.level} · ${art.badge}`;
+    document.getElementById('readerReadTime').textContent = art.readTime;
+
+    renderArticleContent(art);
+    selectTargetSentence(0);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    playChime();
+  }
+
+  function closeArticleReader() {
+    stopArticleAudio();
+    document.getElementById('articleReaderView').style.display = "none";
+    document.getElementById('readingCatalogView').style.display = "block";
+    playClickSound();
+  }
+
+  function renderArticleContent(article) {
+    const container = document.getElementById('readerBody');
+    if (!container) return;
+    container.innerHTML = "";
+
+    article.sentences.forEach((sentence, sIdx) => {
+      const row = document.createElement('div');
+      row.className = `read-sentence-row ${sIdx === selectedShadowIndex ? 'selected-target' : ''}`;
+      row.id = `sentRow_${sIdx}`;
+
+      const btnCol = document.createElement('div');
+      btnCol.style.cssText = "display: flex; gap: 4px; padding-top: 2px;";
+      btnCol.innerHTML = `
+        <button class="sentence-action-btn" onclick="playSingleSentence(${sIdx})" title="이 문장 원어민 음성 듣기">🔊</button>
+        <button class="sentence-action-btn" onclick="selectTargetSentence(${sIdx})" title="이 문장 따라 읽기(쉐도잉) 선택">🎙️</button>
+      `;
+
+      const textWrap = document.createElement('div');
+      textWrap.style.flex = "1";
+
+      const rawTokens = sentence.split(/(\s+)/);
+      rawTokens.forEach(token => {
+        if (/^\s+$/.test(token)) {
+          textWrap.appendChild(document.createTextNode(token));
+        } else {
+          const cleanWord = token.replace(/[^a-zA-Z]/g, '').toLowerCase();
+          const span = document.createElement('span');
+          span.className = "read-word";
+          const isSaved = currentProfile && currentProfile.bookmarks && currentProfile.bookmarks.some(b => b.type === 'vocab' && b.word.toLowerCase() === cleanWord);
+          if (isSaved) span.classList.add('saved');
+
+          span.textContent = token;
+          span.onclick = (e) => lookupWord(token, sentence, e);
+          textWrap.appendChild(span);
+        }
+      });
+
+      row.appendChild(btnCol);
+      row.appendChild(textWrap);
+      container.appendChild(row);
+    });
+  }
+
+  function togglePlayFullArticle() {
+    if (isPlayingArticle) {
+      stopArticleAudio();
+    } else {
+      startPlayFullArticle(0);
+    }
+  }
+
+  function startPlayFullArticle(startIndex = 0) {
+    if (!currentArticle) return;
+    isPlayingArticle = true;
+    articleAudioIndex = startIndex;
+    const playBtn = document.getElementById('btnPlayAll');
+    if (playBtn) {
+      playBtn.classList.remove('btn-green');
+      playBtn.classList.add('btn-red');
+      playBtn.textContent = "⏸️ 일시 정지";
+    }
+    playNextArticleSentence();
+  }
+
+  function playNextArticleSentence() {
+    if (!isPlayingArticle || !currentArticle || articleAudioIndex >= currentArticle.sentences.length) {
+      stopArticleAudio();
+      return;
+    }
+
+    document.querySelectorAll('.read-sentence-row').forEach(r => r.classList.remove('active-reading'));
+    const curRow = document.getElementById(`sentRow_${articleAudioIndex}`);
+    if (curRow) {
+      curRow.classList.add('active-reading');
+      curRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    const sentence = currentArticle.sentences[articleAudioIndex];
+    if (speechSynth.speaking) speechSynth.cancel();
+
+    const utter = new SpeechSynthesisUtterance(sentence);
+    utter.lang = 'en-US';
+    utter.rate = articleAudioSpeed;
+
+    utter.onend = () => {
+      if (!isPlayingArticle) return;
+      articleAudioIndex++;
+      setTimeout(playNextArticleSentence, 400);
+    };
+
+    utter.onerror = () => {
+      stopArticleAudio();
+    };
+
+    speechSynth.speak(utter);
+  }
+
+  function stopArticleAudio() {
+    isPlayingArticle = false;
+    if (speechSynth.speaking) speechSynth.cancel();
+    document.querySelectorAll('.read-sentence-row').forEach(r => r.classList.remove('active-reading'));
+    const playBtn = document.getElementById('btnPlayAll');
+    if (playBtn) {
+      playBtn.classList.remove('btn-red');
+      playBtn.classList.add('btn-green');
+      playBtn.textContent = "▶ 원어민 전체 듣기";
+    }
+  }
+
+  function changeArticleAudioSpeed(val) {
+    articleAudioSpeed = parseFloat(val);
+    playClickSound();
+  }
+
+  function playSingleSentence(sIdx) {
+    if (!currentArticle) return;
+    stopArticleAudio();
+    document.querySelectorAll('.read-sentence-row').forEach(r => r.classList.remove('active-reading'));
+    const curRow = document.getElementById(`sentRow_${sIdx}`);
+    if (curRow) curRow.classList.add('active-reading');
+
+    speakText(currentArticle.sentences[sIdx]);
+  }
+
+  function selectTargetSentence(idx) {
+    if (!currentArticle || !currentArticle.sentences[idx]) return;
+    selectedShadowIndex = idx;
+    document.querySelectorAll('.read-sentence-row').forEach((r, i) => {
+      r.classList.toggle('selected-target', i === idx);
+    });
+
+    const box = document.getElementById('shadowTargetBox');
+    if (box) {
+      box.textContent = currentArticle.sentences[idx];
+    }
+    const scoreCard = document.getElementById('shadowScoreCard');
+    if (scoreCard) scoreCard.style.display = "none";
+  }
+
+  function listenTargetSentence() {
+    if (!currentArticle || !currentArticle.sentences[selectedShadowIndex]) return;
+    speakText(currentArticle.sentences[selectedShadowIndex]);
+  }
+
+  function toggleShadowingMic() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      alert("이 브라우저는 음성 인식을 지원하지 않습니다. Chrome 브라우저를 권장합니다.");
+      return;
+    }
+
+    const btn = document.getElementById('btnShadowMic');
+    if (isShadowRecording) {
+      if (shadowRecognition) shadowRecognition.stop();
+      isShadowRecording = false;
+      btn.classList.remove('btn-red');
+      btn.classList.add('btn-green');
+      btn.innerHTML = "🎙️ 따라 읽기 시작";
+      return;
+    }
+
+    try {
+      shadowRecognition = new SpeechRec();
+      shadowRecognition.lang = 'en-US';
+      shadowRecognition.continuous = false;
+      shadowRecognition.interimResults = true;
+
+      const targetText = currentArticle.sentences[selectedShadowIndex] || "";
+      const scoreCard = document.getElementById('shadowScoreCard');
+      scoreCard.style.display = "block";
+      scoreCard.innerHTML = `<div style="color:var(--text-muted); font-size:13px;">듣는 중... 천천히 소리 내어 읽어보세요 🎙️</div>`;
+
+      btn.classList.remove('btn-green');
+      btn.classList.add('btn-red');
+      btn.innerHTML = "⏹️ 읽기 완료 (터치)";
+      isShadowRecording = true;
+
+      shadowRecognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        if (event.results[0].isFinal) {
+          finishShadowEvaluation(targetText, transcript);
+        } else {
+          scoreCard.innerHTML = `
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">실시간 인식:</div>
+            <div style="font-size:14px; color:#FFFFFF;">${transcript}</div>
+          `;
+        }
+      };
+
+      shadowRecognition.onerror = (e) => {
+        isShadowRecording = false;
+        btn.classList.remove('btn-red');
+        btn.classList.add('btn-green');
+        btn.innerHTML = "🎙️ 따라 읽기 시작";
+      };
+
+      shadowRecognition.onend = () => {
+        isShadowRecording = false;
+        btn.classList.remove('btn-red');
+        btn.classList.add('btn-green');
+        btn.innerHTML = "🎙️ 따라 읽기 시작";
+      };
+
+      shadowRecognition.start();
+    } catch(e) {
+      console.error(e);
+      isShadowRecording = false;
+      btn.classList.remove('btn-red');
+      btn.classList.add('btn-green');
+      btn.innerHTML = "🎙️ 따라 읽기 시작";
+    }
+  }
+
+  function evaluatePronunciation(targetText, spokenText) {
+    const cleanTarget = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+    const cleanSpoken = spokenText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+
+    let matchCount = 0;
+    const wordResults = cleanTarget.map(w => {
+      if (cleanSpoken.includes(w)) {
+        matchCount++;
+        return { word: w, correct: true };
+      } else {
+        return { word: w, correct: false };
+      }
+    });
+
+    const score = Math.max(10, Math.min(100, Math.round((matchCount / Math.max(1, cleanTarget.length)) * 100)));
+    return { score, wordResults, matchCount, total: cleanTarget.length };
+  }
+
+  function finishShadowEvaluation(targetText, spokenText) {
+    const evalResult = evaluatePronunciation(targetText, spokenText);
+    const scoreCard = document.getElementById('shadowScoreCard');
+    scoreCard.style.display = "block";
+
+    let praise = "👍 훌륭해요! 조금 더 자연스럽게 연습해 볼까요?";
+    if (evalResult.score >= 90) praise = "🌟 완벽해요! 원어민 수준의 정확한 발음입니다!";
+    else if (evalResult.score >= 70) praise = "👏 아주 좋아요! 핵심 단어들이 잘 전달되었습니다.";
+
+    let wordPillsHtml = evalResult.wordResults.map(w => {
+      return w.correct
+        ? `<span class="word-pill-correct">✓ ${w.word}</span>`
+        : `<span class="word-pill-missed">✕ ${w.word}</span>`;
+    }).join(' ');
+
+    scoreCard.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div class="score-badge" style="color:${evalResult.score >= 80 ? 'var(--primary)' : 'var(--accent-yellow)'};">
+          🎯 ${evalResult.score}점 <span style="font-size:14px; color:var(--text-muted);">/ 100점</span>
+        </div>
+        <span style="font-size:12px; font-weight:800; color:var(--primary);">+15 XP 획득! ⚡</span>
+      </div>
+      <div style="font-size:13px; font-weight:700; color:#fff; margin-bottom:8px;">${praise}</div>
+      <div style="margin-bottom:8px; font-size:12px; color:var(--text-muted);">발음 단어 분석:</div>
+      <div style="margin-bottom:8px;">${wordPillsHtml}</div>
+      <div style="font-size:11px; color:var(--text-muted); background:rgba(0,0,0,0.25); padding:6px 10px; border-radius:8px;">
+        인식된 내 음성: "${spokenText}"
+      </div>
+    `;
+
+    if (evalResult.score >= 80) playCompleteFanfare();
+    else playChime();
+
+    addXp(15);
+  }
+
+  function lookupWord(rawWord, sentence, event) {
+    if (event) event.stopPropagation();
+    const cleanWord = rawWord.toLowerCase().replace(/[^a-z]/g, '');
+    if (!cleanWord) return;
+
+    let vocabInfo = null;
+    if (currentArticle && currentArticle.vocab && currentArticle.vocab[cleanWord]) {
+      vocabInfo = currentArticle.vocab[cleanWord];
+    } else if (COMMON_DICT[cleanWord]) {
+      vocabInfo = COMMON_DICT[cleanWord];
+    } else {
+      vocabInfo = {
+        ipa: `/${cleanWord}/`,
+        en: `The word '${cleanWord}' used in everyday English conversation.`,
+        ko: `'${cleanWord}' (문맥에 맞는 의미로 쓰인 핵심 어휘)`
+      };
+    }
+
+    currentLookupData = {
+      word: cleanWord,
+      displayWord: rawWord.replace(/[^a-zA-Z]/g, ''),
+      ipa: vocabInfo.ipa || `/${cleanWord}/`,
+      en: vocabInfo.en || `Definition of ${cleanWord}`,
+      ko: vocabInfo.ko || `${cleanWord}의 의미`,
+      example: sentence || "",
+      currentLang: (currentProfile && currentProfile.dictLang) ? currentProfile.dictLang : 'ko'
+    };
+
+    updateWordModalDisplay();
+    document.getElementById('wordDetailModal').classList.add('active');
+    playClickSound();
+  }
+
+  function updateWordModalDisplay() {
+    if (!currentLookupData) return;
+    document.getElementById('wordModalTitle').textContent = currentLookupData.displayWord;
+    document.getElementById('wordModalIpa').textContent = currentLookupData.ipa;
+
+    const isEn = (currentLookupData.currentLang === 'en');
+    document.getElementById('wordDefTypeBadge').textContent = isEn ? "🇺🇸 영어 설명 (영영)" : "🇰🇷 한국어 설명 (영한)";
+    document.getElementById('wordModalDefinition').textContent = isEn ? currentLookupData.en : currentLookupData.ko;
+    document.getElementById('wordModalExample').textContent = currentLookupData.example ? `문맥 예문: "${currentLookupData.example}"` : "";
+
+    const isSaved = currentProfile && currentProfile.bookmarks && currentProfile.bookmarks.some(b => b.type === 'vocab' && b.word.toLowerCase() === currentLookupData.word.toLowerCase());
+    const saveBtn = document.getElementById('btnSaveWordToDeck');
+    if (isSaved) {
+      saveBtn.className = "btn-3d btn-blue";
+      saveBtn.textContent = "✓ 단어장에 이미 저장됨";
+    } else {
+      saveBtn.className = "btn-3d btn-green";
+      saveBtn.textContent = "★ 내 단어장에 등록하기";
+    }
+  }
+
+  function toggleCurrentWordLang() {
+    if (!currentLookupData) return;
+    currentLookupData.currentLang = (currentLookupData.currentLang === 'en') ? 'ko' : 'en';
+    updateWordModalDisplay();
+    playClickSound();
+  }
+
+  function speakCurrentWord() {
+    if (!currentLookupData) return;
+    speakText(currentLookupData.displayWord);
+  }
+
+  function saveCurrentWordToDeck() {
+    if (!currentLookupData || !currentProfile) return;
+    if (!currentProfile.bookmarks) currentProfile.bookmarks = [];
+
+    const exists = currentProfile.bookmarks.some(b => b.type === 'vocab' && b.word.toLowerCase() === currentLookupData.word.toLowerCase());
+    if (!exists) {
+      currentProfile.bookmarks.unshift({
+        id: "v_" + Date.now(),
+        type: "vocab",
+        word: currentLookupData.displayWord,
+        ipa: currentLookupData.ipa,
+        defEn: currentLookupData.en,
+        defKo: currentLookupData.ko,
+        example: currentLookupData.example,
+        date: new Date().toLocaleDateString()
+      });
+      saveProfiles();
+      playCompleteFanfare();
+      showToast(`'${currentLookupData.displayWord}' 단어가 단어장에 등록되었습니다! ★`);
+    } else {
+      showToast(`이미 단어장에 등록된 단어입니다.`);
+    }
+    updateWordModalDisplay();
+
+    document.querySelectorAll('.read-word').forEach(el => {
+      if (el.textContent.replace(/[^a-zA-Z]/g, '').toLowerCase() === currentLookupData.word.toLowerCase()) {
+        el.classList.add('saved');
+      }
+    });
   }
 
   function openVocabModal() {
     const container = document.getElementById('vocabListContainer');
+    if (!container) return;
     container.innerHTML = "";
-    const list = currentProfile.bookmarks || [];
+    const list = (currentProfile && currentProfile.bookmarks) ? currentProfile.bookmarks : [];
 
     if (list.length === 0) {
       container.innerHTML = `
         <div style="text-align: center; color: var(--text-muted); padding: 40px 10px;">
           <div style="font-size: 40px; margin-bottom: 10px;">★</div>
-          <div>아직 저장된 오답이나 북마크 표현이 없습니다.<br>회화 중에 [★ 북마크]를 눌러보세요!</div>
+          <div>아직 저장된 단어나 북마크 표현이 없습니다.<br>리딩 중 단어를 터치하여 등록하거나 회화 중 [★ 북마크]를 눌러보세요!</div>
         </div>
       `;
     } else {
-      list.forEach(item => {
+      list.forEach((item, idx) => {
         const card = document.createElement('div');
-        card.style.cssText = "background:#101B20; border:1px solid var(--card-border); border-radius:14px; padding:12px; display:flex; justify-content:space-between; align-items:center;";
-        card.innerHTML = `
-          <div>
-            <div style="font-size:14px; font-weight:800; color:var(--accent-blue);">${item.native}</div>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">내 원래 발화: "${item.original}"</div>
-          </div>
-          <button class="bubble-btn" onclick="speakText('${escapeQuotes(item.native)}')">🔊 듣기</button>
-        `;
+        card.style.cssText = "background:#101B20; border:1px solid var(--card-border); border-radius:14px; padding:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;";
+
+        if (item.type === 'vocab') {
+          const isEn = (currentProfile && currentProfile.dictLang === 'en');
+          const def = isEn ? (item.defEn || item.defKo) : (item.defKo || item.defEn);
+          card.innerHTML = `
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:15px; font-weight:800; color:var(--primary);">${item.word}</span>
+                <span style="font-size:11px; color:var(--text-muted);">${item.ipa || ''}</span>
+                <span style="font-size:10px; background:rgba(88,204,2,0.15); color:var(--primary); padding:2px 6px; border-radius:6px;">📖 리딩 단어</span>
+              </div>
+              <div style="font-size:13px; color:#FFFFFF; margin-top:3px;">${def}</div>
+              ${item.example ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">예문: "${item.example}"</div>` : ''}
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button class="bubble-btn" onclick="speakText('${escapeQuotes(item.word)}')">🔊</button>
+              <button onclick="deleteVocabItem(${idx})" style="background:none; border:none; color:#ff4b4b; cursor:pointer; font-size:16px; padding:4px;" title="삭제">🗑️</button>
+            </div>
+          `;
+        } else {
+          card.innerHTML = `
+            <div style="flex:1;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:14px; font-weight:800; color:var(--accent-blue);">${item.native}</span>
+                <span style="font-size:10px; background:rgba(28,176,246,0.15); color:var(--accent-blue); padding:2px 6px; border-radius:6px;">💬 회화 표현</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">내 원래 발화: "${item.original}"</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button class="bubble-btn" onclick="speakText('${escapeQuotes(item.native)}')">🔊</button>
+              <button onclick="deleteVocabItem(${idx})" style="background:none; border:none; color:#ff4b4b; cursor:pointer; font-size:16px; padding:4px;" title="삭제">🗑️</button>
+            </div>
+          `;
+        }
         container.appendChild(card);
       });
     }
 
     document.getElementById('vocabModal').classList.add('active');
+  }
+
+  function deleteVocabItem(idx) {
+    if (!currentProfile || !currentProfile.bookmarks) return;
+    currentProfile.bookmarks.splice(idx, 1);
+    saveProfiles();
+    openVocabModal();
+    showToast("항목이 단어장에서 삭제되었습니다.");
   }
 
   function closeModal(modalId) {
