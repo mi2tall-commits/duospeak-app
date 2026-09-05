@@ -368,6 +368,33 @@
       background: rgba(88, 204, 2, 0.2);
       transform: scale(1.08);
     }
+    .level-card-opt {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #101B20;
+      border: 2px solid var(--card-border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .level-card-opt:hover {
+      border-color: rgba(88, 204, 2, 0.5);
+      background: rgba(88, 204, 2, 0.05);
+    }
+    .level-card-opt.selected {
+      border-color: var(--primary);
+      background: rgba(88, 204, 2, 0.15);
+    }
+    .level-card-badge {
+      font-size: 11px;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
 
     /* Speaking Stage Screen (Session) */
     .session-view {
@@ -707,9 +734,12 @@
   <!-- Main View: Duolingo Stepping Stone Map -->
   <main class="map-container" id="mainMapView">
     <!-- Level Banner -->
-    <div class="unit-banner lv-green" id="unitBanner">
+    <div class="unit-banner lv-green" id="unitBanner" onclick="openUnitSelectModal()" style="cursor: pointer;" title="클릭하여 단원(레벨) 변경">
       <div>
-        <span class="unit-badge" id="unitBadge">UNIT 1 · 입문</span>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <span class="unit-badge" id="unitBadge" style="margin-bottom: 0;">UNIT 1 · 입문</span>
+          <span style="font-size: 11px; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 6px; color: #fff; font-weight: 800;">🔄 단원 변경</span>
+        </div>
         <h2 class="unit-title" id="unitTitle">기초 생존 회화</h2>
         <p class="unit-desc" id="unitDesc">기초 단어로 해외에서 막힘없이 주문하기</p>
       </div>
@@ -841,6 +871,82 @@
 </div>
 
 <!-- ========================================== -->
+<!-- 👋 MODAL: Welcome & First-time Setup       -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="welcomeModal" style="z-index: 1000;">
+  <div class="modal-card" style="max-width: 480px; text-align: center;">
+    <div style="font-size: 54px; margin-bottom: 8px;">🦉</div>
+    <h2 style="font-size: 22px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.4px;">DuoSpeak AI에 오신 것을 환영해요!</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+      학습을 시작할 <strong>프로필</strong>과 <strong>시작 레벨</strong>을 설정해 주세요.<br>
+      한 번 등록하면 다음 접속 시 0클릭으로 바로 학습이 이어집니다.
+    </p>
+
+    <div style="text-align: left; display: flex; flex-direction: column; gap: 14px;">
+      <!-- Step 1: Name -->
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+          <span style="background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">1</span>
+          이름 또는 별명 (가족 닉네임)
+        </label>
+        <input type="text" id="welcomeProfileName" class="form-input" placeholder="예: 민수, 지은, 아빠, 엄마, 앨리스 등" autofocus onkeypress="if(event.key === 'Enter') createFirstProfile()">
+      </div>
+
+      <!-- Step 2: Avatar -->
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+          <span style="background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">2</span>
+          나만의 캐릭터 선택
+        </label>
+        <div class="avatar-picker" id="welcomeAvatarPicker" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="avatar-opt selected" onclick="selectWelcomeAvatar(this, '🦉')">🦉</div>
+          <div class="avatar-opt" onclick="selectWelcomeAvatar(this, '🦊')">🦊</div>
+          <div class="avatar-opt" onclick="selectWelcomeAvatar(this, '🐱')">🐱</div>
+          <div class="avatar-opt" onclick="selectWelcomeAvatar(this, '🐻')">🐻</div>
+          <div class="avatar-opt" onclick="selectWelcomeAvatar(this, '🐶')">🐶</div>
+          <div class="avatar-opt" onclick="selectWelcomeAvatar(this, '🐰')">🐰</div>
+          <div class="avatar-opt" onclick="selectWelcomeAvatar(this, '🐼')">🐼</div>
+          <div class="avatar-opt" onclick="selectWelcomeAvatar(this, '🦁')">🦁</div>
+        </div>
+      </div>
+
+      <!-- Step 3: Level Selection (10 Granular Levels) -->
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+          <span style="background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">3</span>
+          시작 레벨 선택 (10단계 로드맵)
+        </label>
+        <div class="level-select-grid" id="welcomeLevelGrid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <button class="btn-3d btn-green" style="width: 100%; padding: 14px; font-size: 16px; border-radius: 16px; margin-top: 6px;" onclick="createFirstProfile()">
+        🚀 프로필 생성 및 학습 시작하기
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 🗺️ MODAL: Unit / Level Selector (1~10)     -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="unitSelectModal">
+  <div class="modal-card" style="max-width: 480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">학습 단원(레벨) 변경</h3>
+      <button class="btn-close" onclick="closeModal('unitSelectModal')">✕</button>
+    </div>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+      원하는 단원을 선택하면 해당 단원의 회화 스테이지로 바로 이동합니다.
+    </p>
+    <div id="unitSelectList" style="display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow-y: auto; padding-right: 4px;">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
 <!-- 👥 MODAL: Family Profile & Level Switcher  -->
 <!-- ========================================== -->
 <div class="modal-overlay" id="profileModal">
@@ -897,6 +1003,11 @@
       <button class="btn-3d btn-green" style="width: 100%; border-radius: 16px;" onclick="addNewProfile()">
         프로필 생성 완료
       </button>
+      <div style="margin-top: 14px; text-align: center;">
+        <button onclick="resetAllData()" style="background: none; border: none; color: #ff4b4b; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: underline;">
+          ⚠️ 모든 프로필 초기화 (처음 설정으로 돌아가기)
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -1074,10 +1185,12 @@
   let speechSynth = window.speechSynthesis;
 
   function initApp() {
-    loadStoredData();
-    renderMapNodes();
     initWebAudio();
     initSpeechRecognition();
+    const hasProfile = loadStoredData();
+    if (hasProfile) {
+      renderMapNodes();
+    }
   }
 
   function loadStoredData() {
@@ -1086,20 +1199,156 @@
       try { profiles = JSON.parse(rawProfiles); } catch(e) { profiles = []; }
     }
 
+    // If existing profiles are just the old pre-populated dummy presets, wipe them clean
+    if (profiles && profiles.length > 0 && profiles.every(p => ['p_daram', 'p_mom', 'p_dad'].includes(p.id))) {
+      profiles = [];
+      localStorage.removeItem('duospeak_profiles');
+      localStorage.removeItem('duospeak_active_profile_id');
+    }
+
     if (!profiles || profiles.length === 0) {
-      // Default Initial Profiles for Family
-      profiles = [
-        { id: "p_daram", name: "다람이", avatar: "🦉", level: 3, xp: 60, streak: 3, lastActive: "2026-09-05", completed: ["1-1", "1-2"], bookmarks: [] },
-        { id: "p_mom", name: "엄마", avatar: "🐱", level: 1, xp: 20, streak: 1, lastActive: "2026-09-05", completed: ["1-1"], bookmarks: [] },
-        { id: "p_dad", name: "아빠", avatar: "🐻", level: 4, xp: 80, streak: 4, lastActive: "2026-09-05", completed: ["1-1", "1-2", "2-1"], bookmarks: [] }
-      ];
-      saveProfiles();
+      profiles = [];
+      currentProfile = null;
+      updateHeaderStats();
+      openWelcomeModal();
+      return false;
     }
 
     // Auto-Resume to Last Active Profile
     const lastActiveId = localStorage.getItem('duospeak_active_profile_id') || profiles[0].id;
     currentProfile = profiles.find(p => p.id === lastActiveId) || profiles[0];
     updateHeaderStats();
+    return true;
+  }
+
+  let welcomeSelectedAvatar = '🦉';
+  let welcomeSelectedLevel = 1;
+
+  function openWelcomeModal() {
+    welcomeSelectedAvatar = '🦉';
+    welcomeSelectedLevel = 1;
+    document.getElementById('welcomeProfileName').value = "";
+    document.querySelectorAll('#welcomeAvatarPicker .avatar-opt').forEach(el => {
+      el.classList.toggle('selected', el.innerText.trim() === '🦉');
+    });
+    renderWelcomeLevels();
+    document.getElementById('welcomeModal').classList.add('active');
+  }
+
+  function selectWelcomeAvatar(elem, avatarChar) {
+    document.querySelectorAll('#welcomeAvatarPicker .avatar-opt').forEach(el => el.classList.remove('selected'));
+    elem.classList.add('selected');
+    welcomeSelectedAvatar = avatarChar;
+    playClickSound();
+  }
+
+  function renderWelcomeLevels() {
+    const grid = document.getElementById('welcomeLevelGrid');
+    grid.innerHTML = "";
+    for (let lvl = 1; lvl <= 10; lvl++) {
+      const data = ROADMAP_DATA[lvl];
+      const isSel = (lvl === welcomeSelectedLevel);
+      const card = document.createElement('div');
+      card.className = `level-card-opt ${isSel ? 'selected' : ''}`;
+      card.onclick = () => {
+        welcomeSelectedLevel = lvl;
+        renderWelcomeLevels();
+        playClickSound();
+      };
+      const badgeBg = (lvl <= 3) ? 'var(--primary)' : (lvl <= 7 ? 'var(--accent-blue)' : 'var(--accent-purple)');
+      card.innerHTML = `
+        <div class="level-card-badge" style="background:${badgeBg}; color:#fff;">
+          Lv ${lvl}
+        </div>
+        <div style="flex: 1;">
+          <div style="font-weight: 800; font-size: 13px; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+            <span>${data.title} <span style="font-size: 11px; opacity: 0.8;">(${data.badge})</span></span>
+            <span>${data.icon}</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${data.desc}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+  }
+
+  function createFirstProfile() {
+    const nameInput = document.getElementById('welcomeProfileName');
+    const name = nameInput.value.trim();
+    if (!name) {
+      alert("이름 또는 별명을 입력해 주세요! (예: 민수, 아빠, 엄마 등)");
+      nameInput.focus();
+      return;
+    }
+
+    const newProfile = {
+      id: "p_" + Date.now(),
+      name: name,
+      avatar: welcomeSelectedAvatar,
+      level: welcomeSelectedLevel,
+      xp: 0,
+      streak: 1,
+      lastActive: new Date().toLocaleDateString(),
+      completed: [],
+      bookmarks: []
+    };
+
+    profiles = [newProfile];
+    currentProfile = newProfile;
+    saveProfiles();
+
+    document.getElementById('welcomeModal').classList.remove('active');
+    updateHeaderStats();
+    renderMapNodes();
+
+    playCompleteFanfare();
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+    showToast(`환영합니다, ${name}님! 즐거운 영어 회화를 시작해 보세요 🎉`);
+  }
+
+  function openUnitSelectModal() {
+    const list = document.getElementById('unitSelectList');
+    list.innerHTML = "";
+    const curLvl = currentProfile ? (currentProfile.level || 1) : 1;
+
+    for (let lvl = 1; lvl <= 10; lvl++) {
+      const data = ROADMAP_DATA[lvl];
+      const isCur = (lvl === curLvl);
+      const item = document.createElement('div');
+      item.className = `level-card-opt ${isCur ? 'selected' : ''}`;
+      item.onclick = () => selectUnit(lvl);
+
+      const badgeBg = (lvl <= 3) ? 'var(--primary)' : (lvl <= 7 ? 'var(--accent-blue)' : 'var(--accent-purple)');
+      item.innerHTML = `
+        <div class="level-card-badge" style="background:${badgeBg}; color:#fff;">
+          Lv ${lvl}
+        </div>
+        <div style="flex: 1;">
+          <div style="font-weight: 800; font-size: 13px; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+            <span>${data.title} ${isCur ? '<span style="color:var(--primary); font-size:11px;">(현재 학습 중)</span>' : ''}</span>
+            <span>${data.icon}</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${data.desc}</div>
+        </div>
+        <button class="btn-3d ${isCur ? 'btn-green' : 'btn-outline'}" style="padding: 6px 12px; font-size: 12px; border-radius: 10px;">
+          ${isCur ? '학습 중' : '선택'}
+        </button>
+      `;
+      list.appendChild(item);
+    }
+    document.getElementById('unitSelectModal').classList.add('active');
+    playClickSound();
+  }
+
+  function selectUnit(lvl) {
+    if (!currentProfile) return;
+    currentProfile.level = lvl;
+    saveProfiles();
+    updateHeaderStats();
+    renderMapNodes();
+    closeModal('unitSelectModal');
+    playChime();
+    showToast(`Unit ${lvl} (${ROADMAP_DATA[lvl].title}) 단원으로 이동했습니다! 🦉`);
   }
 
   function saveProfiles() {
@@ -1110,7 +1359,13 @@
   }
 
   function updateHeaderStats() {
-    if (!currentProfile) return;
+    if (!currentProfile) {
+      document.getElementById('profileName').textContent = "프로필 만들기";
+      document.getElementById('profileAvatar').textContent = "👤";
+      document.getElementById('streakCount').textContent = "0";
+      document.getElementById('xpCount').textContent = "0";
+      return;
+    }
     document.getElementById('profileName').textContent = currentProfile.name;
     document.getElementById('profileAvatar').textContent = currentProfile.avatar;
     document.getElementById('streakCount').textContent = currentProfile.streak;
@@ -1134,6 +1389,7 @@
   function renderMapNodes() {
     const container = document.getElementById('nodesPath');
     container.innerHTML = "";
+    if (!currentProfile) return;
     const lvl = currentProfile.level || 1;
     const unitData = ROADMAP_DATA[lvl] || ROADMAP_DATA[1];
 
@@ -1659,8 +1915,13 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     const container = document.getElementById('profileListContainer');
     container.innerHTML = "";
 
+    if (!profiles || profiles.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-muted);">등록된 프로필이 없습니다. 아래에서 추가해 보세요.</div>';
+      return;
+    }
+
     profiles.forEach(p => {
-      const isCurrent = (p.id === currentProfile.id);
+      const isCurrent = currentProfile && (p.id === currentProfile.id);
       const row = document.createElement('div');
       row.style.cssText = `
         display: flex; justify-content: space-between; align-items: center;
@@ -1678,12 +1939,46 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
             <div style="font-size: 12px; color: var(--text-muted);">Lv ${p.level} · 🔥 ${p.streak}일 연속 · ⚡ ${p.xp} XP</div>
           </div>
         </div>
-        <button class="btn-3d ${isCurrent ? 'btn-green' : 'btn-outline'}" style="padding: 6px 14px; font-size: 13px; border-radius: 10px;">
-          ${isCurrent ? '선택됨' : '전환'}
-        </button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          ${!isCurrent && profiles.length > 1 ? `<button onclick="event.stopPropagation(); deleteProfile('${p.id}')" style="background:none; border:none; color:#ff4b4b; font-size:18px; cursor:pointer; padding:4px;" title="프로필 삭제">🗑️</button>` : ''}
+          <button class="btn-3d ${isCurrent ? 'btn-green' : 'btn-outline'}" style="padding: 6px 14px; font-size: 13px; border-radius: 10px;">
+            ${isCurrent ? '선택됨' : '전환'}
+          </button>
+        </div>
       `;
       container.appendChild(row);
     });
+  }
+
+  function deleteProfile(profileId) {
+    const target = profiles.find(p => p.id === profileId);
+    if (!target) return;
+    if (!confirm(`'${target.name}' 프로필을 정말 삭제하시겠습니까?`)) return;
+    profiles = profiles.filter(p => p.id !== profileId);
+    if (currentProfile && currentProfile.id === profileId) {
+      currentProfile = profiles[0] || null;
+    }
+    saveProfiles();
+    if (!currentProfile) {
+      closeModal('profileModal');
+      openWelcomeModal();
+    } else {
+      updateHeaderStats();
+      renderMapNodes();
+      renderProfileList();
+    }
+    showToast(`'${target.name}' 프로필이 삭제되었습니다.`);
+  }
+
+  function resetAllData() {
+    if (!confirm("모든 프로필과 학습 기록을 초기화하고 처음 프로필 생성 화면으로 돌아가시겠습니까?")) return;
+    localStorage.removeItem('duospeak_profiles');
+    localStorage.removeItem('duospeak_active_profile_id');
+    profiles = [];
+    currentProfile = null;
+    closeModal('profileModal');
+    openWelcomeModal();
+    showToast("모든 데이터가 초기화되었습니다. 새 프로필을 만들어보세요!");
   }
 
   function switchProfile(profileId) {
