@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DuoSpeak AI | 듀오스픽 영어 회화</title>
-  <meta name="description" content="듀오링고처럼 중독되고 Gemini 3.6 Flash로 입이 터지는 온가족 10단계 AI 영어 회화">
+  <meta name="description" content="듀오링고처럼 중독되고 Gemini 3.6 Flash로 입이 터지는 맞춤형 10단계 AI 영어 회화">
   <meta name="theme-color" content="#131F24">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
   
@@ -1082,8 +1082,8 @@
       <span>단어장</span>
     </div>
     <div class="nav-tab" onclick="openProfileModal()">
-      <span class="icon">👥</span>
-      <span>가족 전환</span>
+      <span class="icon">👤</span>
+      <span>프로필</span>
     </div>
     <div class="nav-tab" onclick="openSettingsModal()">
       <span class="icon">⚙️</span>
@@ -1209,9 +1209,9 @@
       <div class="form-group" style="margin-bottom: 0;">
         <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
           <span style="background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">1</span>
-          이름 또는 별명 (가족 닉네임)
+          이름 또는 닉네임
         </label>
-        <input type="text" id="welcomeProfileName" class="form-input" placeholder="예: 민수, 지은, 아빠, 엄마, 앨리스 등" autofocus onkeypress="if(event.key === 'Enter') createFirstProfile()">
+        <input type="text" id="welcomeProfileName" class="form-input" placeholder="예: 민수, 지은, 앨리스, 마이클 등" autofocus onkeypress="if(event.key === 'Enter') createFirstProfile()">
       </div>
 
       <!-- Step 2: Avatar -->
@@ -1287,12 +1287,12 @@
 </div>
 
 <!-- ========================================== -->
-<!-- 👥 MODAL: Family Profile & Level Switcher  -->
+<!-- 👤 MODAL: Profile & Level Switcher         -->
 <!-- ========================================== -->
 <div class="modal-overlay" id="profileModal">
   <div class="modal-card">
     <div class="modal-header">
-      <h3 class="modal-title">가족 프로필 관리</h3>
+      <h3 class="modal-title">프로필 관리</h3>
       <button class="btn-close" onclick="closeModal('profileModal')">✕</button>
     </div>
 
@@ -1303,10 +1303,10 @@
 
     <!-- Add New Profile Toggle -->
     <div style="border-top: 2px dashed var(--card-border); padding-top: 18px;">
-      <h4 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">+ 새 가족 프로필 추가</h4>
+      <h4 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">+ 새 프로필 추가</h4>
       <div class="form-group">
-        <label class="form-label">이름 또는 별명</label>
-        <input type="text" id="newProfileName" class="form-input" placeholder="예: 엄마, 아빠, 다람이, 민수">
+        <label class="form-label">이름 또는 닉네임</label>
+        <input type="text" id="newProfileName" class="form-input" placeholder="예: 민수, 지은, 앨리스, 마이클 등">
       </div>
       <div class="form-group">
         <label class="form-label">캐릭터 선택</label>
@@ -1373,7 +1373,7 @@
       <label class="form-label">Google Gemini API Key (기기 공용)</label>
       <input type="password" id="inputGeminiApiKey" class="form-input" placeholder="AQ... 또는 AIzaSy...">
       <p style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">
-        💡 한 번 저장하면 이 기기의 모든 가족 프로필이 키 입력 없이 함께 사용합니다.
+        💡 한 번 저장하면 이 기기의 모든 프로필이 키 입력 없이 함께 사용합니다.
       </p>
     </div>
 
@@ -2028,7 +2028,7 @@
     const nameInput = document.getElementById('welcomeProfileName');
     const name = nameInput.value.trim();
     if (!name) {
-      alert("이름 또는 별명을 입력해 주세요! (예: 민수, 아빠, 엄마 등)");
+      alert("이름이나 닉네임을 입력해 주세요! (예: 민수, 지은, 앨리스 등)");
       nameInput.focus();
       return;
     }
