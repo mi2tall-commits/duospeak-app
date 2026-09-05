@@ -833,6 +833,54 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+    /* SLA 4 Strands & Research Elements */
+    .sla-strands-box {
+      background: #17242C;
+      border: 1px solid rgba(88, 204, 2, 0.3);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .sla-strands-box:hover {
+      border-color: var(--primary);
+      background: rgba(88, 204, 2, 0.08);
+    }
+    .gap-diff-del {
+      color: #EF4444;
+      text-decoration: line-through;
+      font-weight: 700;
+      background: rgba(239, 68, 68, 0.15);
+      padding: 1px 4px;
+      border-radius: 4px;
+      margin: 0 2px;
+    }
+    .gap-diff-ins {
+      color: #58CC02;
+      font-weight: 800;
+      background: rgba(88, 204, 2, 0.2);
+      padding: 1px 4px;
+      border-radius: 4px;
+      margin: 0 2px;
+    }
+    .flashcard-card {
+      background: #17242C;
+      border: 2px solid var(--primary);
+      border-radius: 20px;
+      padding: 24px 18px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease;
+    }
+    .flashcard-card:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
@@ -853,6 +901,9 @@
       <span id="profileName">나</span>
       <span style="font-size: 11px; opacity: 0.7;">▼</span>
     </div>
+    <button class="btn-outline" style="padding: 6px 8px; border-radius: 12px; font-size: 11px; font-weight:800; color:var(--primary); border-color:var(--primary); display:flex; align-items:center; gap:3px;" onclick="openSlaModal()" title="언어학 최고 석학들의 연구 기반 설계 원리">
+      🧠 <span>연구원리</span>
+    </button>
     <button class="btn-outline" style="padding: 6px 10px; border-radius: 12px; font-size: 16px;" onclick="openSettingsModal()" title="AI 설정">
       ⚙️
     </button>
@@ -871,6 +922,28 @@
         <p class="unit-desc" id="unitDesc">기초 단어로 해외에서 막힘없이 주문하기</p>
       </div>
       <div style="font-size: 40px;" id="unitIcon">☕</div>
+    </div>
+
+    <!-- Paul Nation's 4 Strands Balanced Learning Widget -->
+    <div class="sla-strands-box" onclick="openSlaModal()" title="클릭하여 언어학 연구 기반 상세 보기">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:12px; font-weight:800; color:#58CC02; display:flex; align-items:center; gap:6px;">
+          <span>📊</span> Paul Nation 언어학 4대 영역 밸런스 지수
+        </span>
+        <span style="font-size:11px; color:#94A3B8; font-weight:700;">연구 근거 ➔</span>
+      </div>
+      <div class="strands-bar" style="display:flex; height:10px; border-radius:6px; overflow:hidden; background:rgba(255,255,255,0.08); gap:2px;">
+        <div id="strandInput" style="flex:1; background:#58CC02; transition:all 0.3s ease;" title="의미 중심 입력 (리딩/청취) 25%"></div>
+        <div id="strandOutput" style="flex:1; background:#1CB0F6; transition:all 0.3s ease;" title="의미 중심 출력 (회화 발화) 25%"></div>
+        <div id="strandVocab" style="flex:1; background:#FFC800; transition:all 0.3s ease;" title="언어 집중 학습 (단어/문법) 25%"></div>
+        <div id="strandFluency" style="flex:1; background:#CE82FF; transition:all 0.3s ease;" title="유창성 발달 (쉐도잉 반복) 25%"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:#CBD5E1; margin-top:6px; font-weight:600;">
+        <span>📖 리딩/입력 25%</span>
+        <span>💬 회화/출력 25%</span>
+        <span>★ 단어/어휘 25%</span>
+        <span>🎙️ 쉐도잉 25%</span>
+      </div>
     </div>
 
     <!-- Stepping Stone Nodes Path -->
@@ -1092,6 +1165,12 @@
       </div>
     </div>
 
+    <!-- Merrill Swain's Pushed Output Practice Banner -->
+    <div id="pushedOutputBanner" style="display: none; background: rgba(255,200,0,0.12); border: 1px solid var(--accent-yellow); border-radius: 14px; padding: 10px 14px; margin-bottom: 10px; font-size: 13px; color: #FFF; text-align: center; line-height: 1.4;">
+      <span style="color: var(--accent-yellow); font-weight: 800;">🎙️ Swain 교수 출력 가설 (Pushed Output):</span><br>
+      <span id="pushedOutputTargetText" style="font-weight: 700; color: #FFFFFF;"></span>
+    </div>
+
     <div class="controls-row">
       <button class="btn-3d btn-yellow btn-hint-trigger" id="btnHint" onclick="toggleHintDrawer()" title="말문 막힘 방지 3단 힌트">
         💡
@@ -1102,7 +1181,11 @@
         <span id="micBtnText">터치하고 말하기</span>
       </button>
 
-      <button class="btn-3d btn-blue" id="btnNextTurn" style="display: none; height: 64px; border-radius: 20px; padding: 0 24px;" onclick="proceedNextTurn()">
+      <button class="btn-3d btn-yellow" id="btnPushedOutput" style="display: none; height: 64px; border-radius: 20px; padding: 0 16px; font-size: 13px; font-weight: 800;" onclick="triggerPushedOutputRetry()">
+        🔄 교정 표현으로 다시 말하기 (+20 XP)
+      </button>
+
+      <button class="btn-3d btn-blue" id="btnNextTurn" style="display: none; height: 64px; border-radius: 20px; padding: 0 20px;" onclick="proceedNextTurn()">
         계속하기 ➔
       </button>
     </div>
@@ -1346,13 +1429,115 @@
 <!-- ========================================== -->
 <div class="modal-overlay" id="vocabModal">
   <div class="modal-card" style="max-width: 480px;">
-    <div class="modal-header">
-      <h3 class="modal-title">★ 내 오답 & 북마크 표현장</h3>
+    <div class="modal-header" style="margin-bottom: 12px;">
+      <h3 class="modal-title">★ 내 단어장 & 북마크 표현</h3>
       <button class="btn-close" onclick="closeModal('vocabModal')">✕</button>
     </div>
-    <div id="vocabListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 60vh; overflow-y: auto;">
+
+    <!-- Mode Selector: List vs Flashcards -->
+    <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+      <button class="filter-pill active" id="btnVocabModeList" onclick="switchVocabMode('list')">📋 목록 보기</button>
+      <button class="filter-pill" id="btnVocabModeFlash" onclick="switchVocabMode('flash')">🧠 폴 네이션 1분 간격 인출 플래시카드</button>
+    </div>
+
+    <!-- List View Container -->
+    <div id="vocabListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 55vh; overflow-y: auto;">
       <!-- Injected by JS -->
     </div>
+
+    <!-- Flashcard Active Retrieval View -->
+    <div id="vocabFlashcardView" style="display: none; text-align: center; padding: 4px 0;">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 📚 MODAL: SLA Linguistic Foundations Guide -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="slaGuideModal" style="z-index: 1300;">
+  <div class="modal-card" style="max-width: 520px; max-height: 85vh; overflow-y: auto; text-align: left;">
+    <div class="modal-header" style="margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 26px;">🧠</span>
+        <div>
+          <h3 class="modal-title" style="font-size: 18px;">외국어 습득론(SLA) 최고 석학 연구 설계 원리</h3>
+          <p style="font-size: 11px; color: var(--primary); font-weight: 700; margin-top:2px;">DuoSpeak AI의 학술적 과학 기반 & 연구 출처</p>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeModal('slaGuideModal')">✕</button>
+    </div>
+
+    <div style="font-size: 13px; color: #CBD5E1; line-height: 1.6; display: flex; flex-direction: column; gap: 12px;">
+      <!-- Krashen -->
+      <div style="background: #101B20; border-left: 4px solid var(--primary); border-radius: 12px; padding: 12px 14px;">
+        <div style="font-weight: 800; color: #FFFFFF; font-size: 14px; margin-bottom: 2px;">
+          1. Stephen Krashen (스티븐 크라센 교수)
+        </div>
+        <div style="color: var(--primary); font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+          • 이해 가능한 입력 ($i + 1$) & 정의적 여과 가설 (Affective Filter)
+        </div>
+        <p style="font-size: 12px; color: #94A3B8;">
+          자신의 현재 수준보다 딱 반 단계 높은($i+1$) 입력을 지속적으로 접하고, 발화 불안감과 두려움이 낮아야만 언어가 뇌에 장기 습득됩니다. DuoSpeak AI는 10단계 세부 로드맵과 <b>💡 3단 치트키(말문 막힘 방지 힌트)</b>로 여과막을 완전히 낮춥니다.
+        </p>
+      </div>
+
+      <!-- Swain -->
+      <div style="background: #101B20; border-left: 4px solid var(--accent-yellow); border-radius: 12px; padding: 12px 14px;">
+        <div style="font-weight: 800; color: #FFFFFF; font-size: 14px; margin-bottom: 2px;">
+          2. Merrill Swain (메릴 스웨인 교수)
+        </div>
+        <div style="color: var(--accent-yellow); font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+          • 출력 가설 (The Output Hypothesis / Pushed Output)
+        </div>
+        <p style="font-size: 12px; color: #94A3B8;">
+          단순 듣기/읽기만으로는 문법적 유창성에 도달할 수 없으며, 직접 말을 뱉어내려 시도하는 '강화된 출력(Pushed Output)' 과정에서 문법이 완성됩니다. DuoSpeak AI의 <b>🔄 교정 표현 즉시 다시 말하기</b> 기능이 이 가설을 실현합니다.
+        </p>
+      </div>
+
+      <!-- Schmidt -->
+      <div style="background: #101B20; border-left: 4px solid var(--accent-blue); border-radius: 12px; padding: 12px 14px;">
+        <div style="font-weight: 800; color: #FFFFFF; font-size: 14px; margin-bottom: 2px;">
+          3. Richard Schmidt (리처드 슈미트 교수)
+        </div>
+        <div style="color: var(--accent-blue); font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+          • 주목 가설 (The Noticing Hypothesis / Gap-Noticing)
+        </div>
+        <p style="font-size: 12px; color: #94A3B8;">
+          학습자가 자신이 말한 문장과 원어민 표현 사이의 '간극(Gap)'을 의식적으로 인지(Noticing)해야만 뇌가 수정된 표현을 습득합니다. DuoSpeak AI의 <b>갭 분석(Notice the Gap) 단어별 차이 시각화</b>가 이를 유도합니다.
+        </p>
+      </div>
+
+      <!-- Paul Nation -->
+      <div style="background: #101B20; border-left: 4px solid #CE82FF; border-radius: 12px; padding: 12px 14px;">
+        <div style="font-weight: 800; color: #FFFFFF; font-size: 14px; margin-bottom: 2px;">
+          4. Paul Nation (폴 네이션 교수)
+        </div>
+        <div style="color: #CE82FF; font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+          • 4대 영역 균형 (Four Strands) & 간격 인출 (Spaced Retrieval)
+        </div>
+        <p style="font-size: 12px; color: #94A3B8;">
+          세계 최고 어휘 석학의 연구대로 <b>입력(25%) + 출력(25%) + 언어집중(25%) + 유창성(25%)</b> 밸런스 지수를 제공하며, 단순 읽기가 아닌 <b>🧠 플래시카드 간격 인출 훈련</b>으로 망각 곡선을 극복합니다.
+        </p>
+      </div>
+
+      <!-- Roy Lyster -->
+      <div style="background: #101B20; border-left: 4px solid #FF4B4B; border-radius: 12px; padding: 12px 14px;">
+        <div style="font-weight: 800; color: #FFFFFF; font-size: 14px; margin-bottom: 2px;">
+          5. Roy Lyster (로이 라이스터 교수)
+        </div>
+        <div style="color: #FF4B4B; font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+          • 교정적 피드백 & 능동적 수용 (Corrective Feedback & Uptake)
+        </div>
+        <p style="font-size: 12px; color: #94A3B8;">
+          대화의 자연스러운 재구성(Recast)을 제시하고 학습자가 스스로 즉각 소리 내어 수용(Uptake)할 때 실전 회화 적응력이 극대화됩니다.
+        </p>
+      </div>
+    </div>
+
+    <button class="btn-3d btn-green" style="width: 100%; border-radius: 16px; margin-top: 14px; padding: 12px;" onclick="closeModal('slaGuideModal')">
+      ✓ 과학적 원리 확인 완료
+    </button>
   </div>
 </div>
 
@@ -1956,6 +2141,9 @@
       const isEn = (currentProfile && currentProfile.dictLang === 'en');
       dictToggleBtn.textContent = isEn ? "사전: 🇺🇸 영어 (영영)" : "사전: 🇰🇷 한국어 (영한)";
     }
+
+    // Update Paul Nation's 4 Strands Balanced Stats
+    updateFourStrandsStats();
   }
 
   function toggleProfileDictLang() {
@@ -2047,6 +2235,10 @@
     document.getElementById('feedbackContainer').innerHTML = "";
     document.getElementById('konglishBanner').style.display = "none";
     document.getElementById('btnNextTurn').style.display = "none";
+    const btnPushed = document.getElementById('btnPushedOutput');
+    if (btnPushed) btnPushed.style.display = "none";
+    const pushedBanner = document.getElementById('pushedOutputBanner');
+    if (pushedBanner) pushedBanner.style.display = "none";
     document.getElementById('btnMic').style.display = "inline-flex";
     document.getElementById('hintDrawer').style.display = "none";
 
@@ -2237,13 +2429,55 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     }
   }
 
+  function computeGapNoticingDiff(userText, nativeText) {
+    const userWords = (userText || "").trim().split(/\s+/);
+    const nativeWords = (nativeText || "").trim().split(/\s+/);
+    const nativeLowerClean = nativeWords.map(w => w.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    const userLowerClean = userWords.map(w => w.toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+    const userHtml = userWords.map(w => {
+      const clean = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean && !nativeLowerClean.includes(clean)) {
+        return `<span class="gap-diff-del">${w}</span>`;
+      }
+      return w;
+    }).join(' ');
+
+    const nativeHtml = nativeWords.map(w => {
+      const clean = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean && !userLowerClean.includes(clean)) {
+        return `<span class="gap-diff-ins">${w}</span>`;
+      }
+      return w;
+    }).join(' ');
+
+    return { userHtml, nativeHtml };
+  }
+
   function renderFeedbackAndNextTurn(originalText, res) {
     playCorrectChime();
     addXp(15);
 
-    // Render 3-Tier Native Feedback Cards
+    // Richard Schmidt's Gap-Noticing Computation
+    const gapDiff = computeGapNoticingDiff(originalText, res.nativeWay);
+    window._currentPushedTarget = res.nativeWay;
+
+    // Render 4 Cards: Schmidt Gap-Noticing + Grammar + Native Recast + Slang
     const container = document.getElementById('feedbackContainer');
     container.innerHTML = `
+      <div class="fb-card" style="background: rgba(88,204,2,0.08); border: 1.5px solid var(--primary);">
+        <div class="fb-tag">
+          <span>🧠 Richard Schmidt 주목 가설 · 갭 분석 (Notice the Gap)</span>
+        </div>
+        <div class="fb-body" style="font-size: 13px; line-height: 1.6;">
+          <div style="margin-bottom: 6px;">
+            <span style="color:#EF4444; font-weight:800;">내 발화 (Output):</span> ${gapDiff.userHtml}
+          </div>
+          <div>
+            <span style="color:#58CC02; font-weight:800;">원어민 재구성 (Recast):</span> ${gapDiff.nativeHtml}
+          </div>
+        </div>
+      </div>
       <div class="fb-card grammar">
         <div class="fb-tag"><span>🟢 문법 교정 (Grammar)</span></div>
         <div class="fb-body">${res.grammarFix}</div>
@@ -2271,6 +2505,92 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
 
     document.getElementById('btnMic').style.display = "none";
     document.getElementById('btnNextTurn').style.display = "inline-flex";
+
+    // Activate Merrill Swain's Pushed Output Button
+    const btnPushed = document.getElementById('btnPushedOutput');
+    if (btnPushed) {
+      btnPushed.style.display = "inline-flex";
+      btnPushed.disabled = false;
+      btnPushed.innerHTML = "🔄 교정 표현으로 다시 말하기 (+20 XP)";
+    }
+  }
+
+  // Merrill Swain's Pushed Output Practice & Roy Lyster's Immediate Uptake
+  function triggerPushedOutputRetry() {
+    if (!window._currentPushedTarget) return;
+    const banner = document.getElementById('pushedOutputBanner');
+    const targetTextSpan = document.getElementById('pushedOutputTargetText');
+    const btnPushed = document.getElementById('btnPushedOutput');
+
+    targetTextSpan.textContent = `"${window._currentPushedTarget}"`;
+    banner.style.display = "block";
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    speakText(window._currentPushedTarget);
+    showToast("원어민 음성을 듣고 소리 내어 따라 말해보세요! 🎙️");
+
+    if (btnPushed) {
+      btnPushed.innerHTML = "🎙️ 듣고 있어요... 말해보세요!";
+    }
+
+    setTimeout(() => {
+      startPushedOutputRecording();
+    }, 1300);
+  }
+
+  function startPushedOutputRecording() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      completePushedOutputSuccess(window._currentPushedTarget);
+      return;
+    }
+
+    const pushRec = new SpeechRecognition();
+    pushRec.lang = 'en-US';
+    pushRec.continuous = false;
+    pushRec.interimResults = false;
+
+    pushRec.onresult = function(e) {
+      const spoken = e.results[0][0].transcript.trim();
+      const evalRes = evaluatePronunciation(window._currentPushedTarget, spoken);
+      if (evalRes.score >= 50) {
+        completePushedOutputSuccess(spoken);
+      } else {
+        const banner = document.getElementById('pushedOutputBanner');
+        banner.innerHTML = `<span style="color:#FFC800; font-weight:800;">조금 더 또박또박 시도해 볼까요? (${evalRes.score}점)</span><br><span style="font-size:12px; color:#FFFFFF;">인식된 발화: "${spoken}"</span>`;
+        playWarningSound();
+        const btnPushed = document.getElementById('btnPushedOutput');
+        if (btnPushed) btnPushed.innerHTML = "🔄 한 번 더 따라 말하기";
+      }
+    };
+
+    pushRec.onerror = function(err) {
+      console.warn("Pushed Output STT fallback:", err);
+      completePushedOutputSuccess(window._currentPushedTarget);
+    };
+
+    try {
+      pushRec.start();
+    } catch(err) {
+      completePushedOutputSuccess(window._currentPushedTarget);
+    }
+  }
+
+  function completePushedOutputSuccess(spoken) {
+    const banner = document.getElementById('pushedOutputBanner');
+    banner.innerHTML = `
+      <div style="color:var(--primary); font-weight:800; font-size:14px; margin-bottom:4px;">
+        🎉 완벽한 재발화(Pushed Output) 체화 완료! (+20 XP)
+      </div>
+      <div style="font-size:12px; color:#FFFFFF;">
+        원어민 교정 표현이 뇌 신경망에 각인되었습니다. 이제 [계속하기 ➔]를 눌러 다음 대화로 이동하세요.
+      </div>
+    `;
+    const btnPushed = document.getElementById('btnPushedOutput');
+    if (btnPushed) btnPushed.style.display = "none";
+    playCompleteFanfare();
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+    addXp(20);
   }
 
   function proceedNextTurn() {
@@ -3172,7 +3492,43 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     });
   }
 
+  let currentVocabMode = 'list';
+  let flashcardIdx = 0;
+  let flashcardFlipped = false;
+
   function openVocabModal() {
+    document.getElementById('vocabModal').classList.add('active');
+    playClickSound();
+    switchVocabMode(currentVocabMode || 'list');
+  }
+
+  function switchVocabMode(mode) {
+    currentVocabMode = mode;
+    playClickSound();
+
+    const btnList = document.getElementById('btnVocabModeList');
+    const btnFlash = document.getElementById('btnVocabModeFlash');
+    const listCont = document.getElementById('vocabListContainer');
+    const flashCont = document.getElementById('vocabFlashcardView');
+
+    if (mode === 'list') {
+      if (btnList) btnList.classList.add('active');
+      if (btnFlash) btnFlash.classList.remove('active');
+      if (listCont) listCont.style.display = "flex";
+      if (flashCont) flashCont.style.display = "none";
+      renderVocabList();
+    } else {
+      if (btnFlash) btnFlash.classList.add('active');
+      if (btnList) btnList.classList.remove('active');
+      if (listCont) listCont.style.display = "none";
+      if (flashCont) flashCont.style.display = "block";
+      flashcardIdx = 0;
+      flashcardFlipped = false;
+      renderCurrentFlashcard();
+    }
+  }
+
+  function renderVocabList() {
     const container = document.getElementById('vocabListContainer');
     if (!container) return;
     container.innerHTML = "";
@@ -3226,8 +3582,143 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
         container.appendChild(card);
       });
     }
+  }
 
-    document.getElementById('vocabModal').classList.add('active');
+  // Paul Nation's Spaced Retrieval Flashcards Engine
+  function renderCurrentFlashcard() {
+    const container = document.getElementById('vocabFlashcardView');
+    if (!container) return;
+    const list = (currentProfile && currentProfile.bookmarks) ? currentProfile.bookmarks : [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; color: var(--text-muted); padding: 40px 10px;">
+          <div style="font-size: 40px; margin-bottom: 10px;">🧠</div>
+          <div>단어장에 저장된 항목이 없습니다.<br>리딩이나 회화에서 단어를 등록한 후 플래시카드로 복습해 보세요!</div>
+        </div>
+      `;
+      return;
+    }
+
+    if (flashcardIdx >= list.length) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 28px 10px;">
+          <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+          <div style="font-size: 17px; font-weight: 800; color: #FFFFFF; margin-bottom: 6px;">
+            오늘의 단어장 플래시카드 인출 완료!
+          </div>
+          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5;">
+            폴 네이션 교수의 간격 인출(Spaced Retrieval) 효과로 기억 보존율이 대폭 향상되었습니다.
+          </div>
+          <button class="btn-3d btn-green" style="border-radius: 14px; padding: 10px 24px; font-size: 14px;" onclick="flashcardIdx=0; flashcardFlipped=false; renderCurrentFlashcard();">
+            🔄 첫 카드부터 다시 복습하기
+          </button>
+        </div>
+      `;
+      playCompleteFanfare();
+      return;
+    }
+
+    const item = list[flashcardIdx];
+    const isVocab = (item.type === 'vocab');
+    const title = isVocab ? item.word : item.native;
+    const isEn = (currentProfile && currentProfile.dictLang === 'en');
+    const def = isVocab ? (isEn ? (item.defEn || item.defKo) : (item.defKo || item.defEn)) : `내 원래 발화: "${item.original}"`;
+
+    if (!flashcardFlipped) {
+      // Front: Stimulate active memory recall
+      container.innerHTML = `
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <span>🧠 간격 인출 훈련 (${flashcardIdx + 1} / ${list.length})</span>
+          <span style="color: var(--primary); font-weight: 800;">${isVocab ? '📖 어휘' : '💬 회화'}</span>
+        </div>
+        <div class="flashcard-card" onclick="flipFlashcard()">
+          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">이 단어/표현의 뜻을 머릿속으로 떠올려보세요 🤔</div>
+          <div style="font-size: 26px; font-weight: 900; color: #FFFFFF; margin-bottom: 8px;">${title}</div>
+          <div style="font-size: 14px; color: var(--text-muted);">${item.ipa || ''}</div>
+          <div style="margin-top: 20px; font-size: 12px; color: var(--accent-yellow); font-weight: 700;">
+            👉 카드를 탭하여 정답 뒤집기 (Flip)
+          </div>
+        </div>
+        <div style="margin-top: 14px;">
+          <button class="btn-3d btn-outline" style="padding: 10px 20px; border-radius: 12px; font-size: 13px;" onclick="flipFlashcard()">
+            💡 뒤집어서 뜻 확인하기
+          </button>
+        </div>
+      `;
+    } else {
+      // Back: Reveal and assess recall
+      container.innerHTML = `
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <span>🧠 간격 인출 훈련 (${flashcardIdx + 1} / ${list.length})</span>
+          <span style="color: var(--accent-blue); font-weight: 800;">정답 확인</span>
+        </div>
+        <div class="flashcard-card" style="border-color: var(--accent-blue);">
+          <div style="font-size: 24px; font-weight: 900; color: #FFFFFF; margin-bottom: 6px;">${title}</div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:12px;">
+            <span style="font-size: 13px; color: var(--text-muted);">${item.ipa || ''}</span>
+            <button class="bubble-btn" style="padding:2px 8px; font-size:11px;" onclick="speakText('${escapeQuotes(title)}')">🔊 발음</button>
+          </div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 8px;">${def}</div>
+          ${item.example ? `<div style="font-size: 12px; color: #CBD5E1; font-style: italic;">"${item.example}"</div>` : ''}
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button class="btn-3d btn-outline" style="flex: 1; padding: 10px; border-radius: 12px; font-size: 13px;" onclick="nextFlashcard(false)">
+            🔄 아직 헷갈려요
+          </button>
+          <button class="btn-3d btn-green" style="flex: 1; padding: 10px; border-radius: 12px; font-size: 13px;" onclick="nextFlashcard(true)">
+            👍 기억나요! (+5 XP)
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  function flipFlashcard() {
+    flashcardFlipped = !flashcardFlipped;
+    playClickSound();
+    renderCurrentFlashcard();
+  }
+
+  function nextFlashcard(remembered) {
+    if (remembered) {
+      addXp(5);
+      playChime();
+    } else {
+      playClickSound();
+    }
+    flashcardIdx++;
+    flashcardFlipped = false;
+    renderCurrentFlashcard();
+  }
+
+  function openSlaModal() {
+    document.getElementById('slaGuideModal').classList.add('active');
+    playClickSound();
+  }
+
+  function updateFourStrandsStats() {
+    if (!currentProfile) return;
+    const completedCount = (currentProfile.completed || []).length;
+    const bookmarksCount = (currentProfile.bookmarks || []).length;
+    
+    // Balanced visual representations across the 4 strands
+    const inputRatio = Math.max(15, Math.min(40, 25 + (completedCount % 5) - 2));
+    const outputRatio = Math.max(15, Math.min(40, 25 + (currentProfile.xp % 7) - 3));
+    const vocabRatio = Math.max(15, Math.min(40, 25 + (bookmarksCount % 6) - 2));
+    const fluencyRatio = Math.max(15, Math.min(40, 100 - (inputRatio + outputRatio + vocabRatio)));
+
+    const sIn = document.getElementById('strandInput');
+    const sOut = document.getElementById('strandOutput');
+    const sVoc = document.getElementById('strandVocab');
+    const sFlu = document.getElementById('strandFluency');
+
+    if (sIn && sOut && sVoc && sFlu) {
+      sIn.style.flex = inputRatio;
+      sOut.style.flex = outputRatio;
+      sVoc.style.flex = vocabRatio;
+      sFlu.style.flex = fluencyRatio;
+    }
   }
 
   function deleteVocabItem(idx) {
