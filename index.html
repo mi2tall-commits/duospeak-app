@@ -1066,6 +1066,11 @@
 <div id="app-container">
   <!-- Duolingo Sticky Header -->
   <header class="duo-header">
+    <div class="stat-pill lang-switcher" id="headerLangPill" onclick="toggleCurrentLanguage()" title="학습 언어 전환 (영어 / 일본어)" style="cursor: pointer; background: rgba(255,255,255,0.08); border: 2px solid var(--primary); padding: 5px 10px; font-size: 13px; font-weight: 800; border-radius: 12px; display: flex; align-items: center; gap: 5px; transition: all 0.2s ease;">
+      <span id="headerLangIcon">🇺🇸</span>
+      <span id="headerLangText">영어</span>
+      <span style="font-size: 10px; opacity: 0.7;">🔄</span>
+    </div>
     <div class="stat-pill streak" id="headerStreakPill" onclick="showStreakModal()" title="🔥 연속 학습 스트릭 현황 확인" style="cursor: pointer; box-shadow: 0 0 10px rgba(255, 120, 0, 0.35);">
       <span>🔥</span>
       <span id="streakCount" style="font-weight: 900;">1일차</span>
@@ -1334,6 +1339,11 @@
       <div class="ai-avatar" id="aiAvatarIcon">🦉</div>
       <div class="speech-bubble">
         <div class="ai-text" id="aiSpeechText">Loading dialogue...</div>
+        <!-- 🇯🇵 Japanese Beginner Pronunciation Guide (Phonetics & Romaji) -->
+        <div id="aiPhoneticsWrap" style="display: none; margin: 8px 0; padding: 8px 12px; background: rgba(255, 217, 0, 0.12); border: 1.5px solid rgba(255, 217, 0, 0.4); border-radius: 10px; text-align: left;">
+          <div id="aiPhoneticKo" style="font-size: 15px; font-weight: 900; color: #ffd900; letter-spacing: 0.5px; line-height: 1.4;"></div>
+          <div id="aiRomaji" style="font-size: 12px; color: #94a3b8; font-family: monospace; margin-top: 3px;"></div>
+        </div>
         <div class="ai-subtext" id="aiSubText">대화 불러오는 중...</div>
         <div class="bubble-actions">
           <button class="bubble-btn" onclick="playAiSpeechAgain()">🔊 다시 듣기</button>
@@ -1457,6 +1467,24 @@
       </div>
 
       <!-- Step 3: Level Selection (10 Granular Levels) -->
+      <div class="form-group">
+        <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+          <span style="background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">2.5</span>
+          학습 목표 언어 선택
+        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="lang-opt-card selected" id="welcomeLangTargetEn" onclick="selectWelcomeTargetLang('en')">
+            <div style="font-size: 24px; margin-bottom: 4px;">🇺🇸</div>
+            <div style="font-weight: 800; font-size: 13px; color: #fff;">영어 회화 & 리딩</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">100 스테이지 + 300 리딩</div>
+          </div>
+          <div class="lang-opt-card" id="welcomeLangTargetJa" onclick="selectWelcomeTargetLang('ja')">
+            <div style="font-size: 24px; margin-bottom: 4px;">🇯🇵</div>
+            <div style="font-weight: 800; font-size: 13px; color: #fff;">일본어 왕초보 회화</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">50 롤플레잉 + 한글 발음</div>
+          </div>
+        </div>
+      </div>
       <div class="form-group" style="margin-bottom: 0;">
         <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
           <span style="background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900;">3</span>
@@ -1542,6 +1570,13 @@
           <div class="avatar-opt" onclick="selectAvatar(this, '🐼')">🐼</div>
           <div class="avatar-opt" onclick="selectAvatar(this, '🦁')">🦁</div>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">학습 목표 언어</label>
+        <select id="newProfileTargetLang" class="form-select" onchange="onProfileTargetLangChange()">
+          <option value="en" selected>🇺🇸 영어 회화 & 300편 리딩 (CEFR 10단계 로드맵)</option>
+          <option value="ja">🇯🇵 일본어 회화 (왕초보 5유닛 50개 롤플레잉 - 한글 발음 & 로마자 완비)</option>
+        </select>
       </div>
       <div class="form-group">
         <label class="form-label">시작 레벨 선택 (10단계)</label>
@@ -3510,6 +3545,1287 @@
 };
 
   // Comprehensive Reading Articles Library (80 Diverse Articles Across 10 Knowledge Domains)
+  
+  // ============================================================
+  // 🇯🇵 DUOSPEAK JAPANESE BEGINNER CURRICULUM (5 Units, 50 Stages)
+  // ============================================================
+  const ROADMAP_DATA_JA = {
+  "1": {
+    "badge": "UNIT 1 · 왕초보",
+    "title": "첫 만남 인사 & 자기소개",
+    "desc": "처음 만났을 때 나누는 기본 인사와 나의 이름·국적 소개하기",
+    "icon": "🌸",
+    "stages": [
+      {
+        "id": "ja-1-1",
+        "title": "첫 만남 인사 나누기",
+        "role": "일본인 친구",
+        "firstLine": "こんにちは、はじめまして！",
+        "firstLineRomaji": "Konnichiwa, hajimemashite!",
+        "firstLinePhonetic": "콘니치와, 하지메마시테!",
+        "firstLineKo": "안녕하세요, 처음 뵙겠습니다!",
+        "hints": {
+          "words": [
+            "はじめまして",
+            "よろしく",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "하지메마시테",
+            "요로시쿠",
+            "오네가이시마스"
+          ],
+          "starter": "はじめまして、私は... (하지메마시테, 와타시와...)",
+          "full": "はじめまして、よろしくお願いします！ (하지메마시테, 요로시쿠 오네가이시마스!)",
+          "fullKo": "처음 뵙겠습니다, 잘 부탁드립니다!"
+        }
+      },
+      {
+        "id": "ja-1-2",
+        "title": "이름과 국적 말하기",
+        "role": "게스트하우스 매니저",
+        "firstLine": "お名前とご出身はどちらですか？",
+        "firstLineRomaji": "Onamae to goshusshin wa dochira desu ka?",
+        "firstLinePhonetic": "오나마에토 고슛신와 도치라데스카?",
+        "firstLineKo": "성함과 출신은 어디신가요?",
+        "hints": {
+          "words": [
+            "韓国",
+            "ソウル",
+            "から来ました"
+          ],
+          "wordsPhonetic": [
+            "칸코쿠",
+            "소우루",
+            "카라 키마시타"
+          ],
+          "starter": "韓国の... (칸코쿠노...)",
+          "full": "韓国のソウルから来ました、ミンホです。(칸코쿠노 소우루카라 키마시타, 민호데스.)",
+          "fullKo": "한국 서울에서 온 민호라고 합니다."
+        }
+      },
+      {
+        "id": "ja-1-3",
+        "title": "고마움 표현하기 (감사 인사)",
+        "role": "친절한 행인",
+        "firstLine": "ハンカチを落としましたよ。どうぞ！",
+        "firstLineRomaji": "Hankachi o otoshimashita yo. Douzo!",
+        "firstLinePhonetic": "한카치오 오토시마시타요. 도-조!",
+        "firstLineKo": "손수건을 떨어뜨리셨어요. 여기요!",
+        "hints": {
+          "words": [
+            "ありがとう",
+            "ございます",
+            "助かりました"
+          ],
+          "wordsPhonetic": [
+            "아리가토-",
+            "고자이마스",
+            "타스카리마시타"
+          ],
+          "starter": "あ、ありがとう... (아, 아리가토-...)",
+          "full": "あ、ありがとうございます！助かりました。(아, 아리가토-고자이마스! 타스카리마시타.)",
+          "fullKo": "아, 대단히 감사합니다! 살았네요."
+        }
+      },
+      {
+        "id": "ja-1-4",
+        "title": "부탁할 때와 사과할 때 (스미마센)",
+        "role": "지하철 승객",
+        "firstLine": "あ、足がぶつかりましたね。大丈夫ですか？",
+        "firstLineRomaji": "A, ashi ga butsukarimashita ne. Daijoubu desu ka?",
+        "firstLinePhonetic": "아, 아시가 부츠카리마시타네. 다이죠-부데스카?",
+        "firstLineKo": "아, 발이 부딪혔네요. 괜찮으세요?",
+        "hints": {
+          "words": [
+            "すみません",
+            "大丈夫です",
+            "ごめんなさい"
+          ],
+          "wordsPhonetic": [
+            "스미마센",
+            "다이죠-부데스",
+            "고멘나사이"
+          ],
+          "starter": "あ、すみません... (아, 스미마센...)",
+          "full": "あ、すみません！こちらこそ大丈夫です。(아, 스미마센! 코치라코소 다이죠-부데스.)",
+          "fullKo": "아, 죄송합니다! 저야말로 괜찮습니다."
+        }
+      },
+      {
+        "id": "ja-1-5",
+        "title": "아침·점심·저녁 시간대별 인사",
+        "role": "동네 편의점 직원",
+        "firstLine": "おはようございます！今日もいい天気ですね。",
+        "firstLineRomaji": "Ohayou gozaimasu! Kyou mo ii tenki desu ne.",
+        "firstLinePhonetic": "오하요- 고자이마스! 쿄-모 이이 텐키데스네.",
+        "firstLineKo": "좋은 아침입니다! 오늘도 날씨가 좋네요.",
+        "hints": {
+          "words": [
+            "おはよう",
+            "ございます",
+            "いい天気"
+          ],
+          "wordsPhonetic": [
+            "오하요-",
+            "고자이마스",
+            "이이 텐키"
+          ],
+          "starter": "おはようございます... (오하요- 고자이마스...)",
+          "full": "おはようございます！本当に気持ちいいですね。(오하요- 고자이마스! 혼토-니 키모치이이데스네.)",
+          "fullKo": "좋은 아침입니다! 정말 기분 좋은 날씨네요."
+        }
+      },
+      {
+        "id": "ja-1-6",
+        "title": "안부 묻기와 대답하기",
+        "role": "오랜만의 일본인 지인",
+        "firstLine": "お久しぶりです！お元気でしたか？",
+        "firstLineRomaji": "Ohisashiburi desu! Ogenki deshita ka?",
+        "firstLinePhonetic": "오히사시부리데스! 오겐키데시타카?",
+        "firstLineKo": "오랜만이에요! 잘 지내셨어요?",
+        "hints": {
+          "words": [
+            "元気です",
+            "おかげさまで",
+            "元気でした"
+          ],
+          "wordsPhonetic": [
+            "겐키데스",
+            "오카게사마데",
+            "겐키데시타"
+          ],
+          "starter": "はい、おかげさまで... (하이, 오카게사마데...)",
+          "full": "はい、おかげさまで元気です！そちらはお元気ですか？ (하이, 오카게사마데 겐키데스! 소치라와 오겐키데스카?)",
+          "fullKo": "네, 덕분에 잘 지내고 있어요! 그쪽은 잘 지내세요?"
+        }
+      },
+      {
+        "id": "ja-1-7",
+        "title": "부탁할 때의 마법 단어 (오네가이시마스)",
+        "role": "카페 직원",
+        "firstLine": "ご注文はお決まりですか？",
+        "firstLineRomaji": "Gochuumon wa okimari desu ka?",
+        "firstLinePhonetic": "고츄-몬와 오키마리데스카?",
+        "firstLineKo": "주문 결정하셨나요?",
+        "hints": {
+          "words": [
+            "ホットコーヒー",
+            "ひとつ",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "홋토 코-히-",
+            "히토츠",
+            "오네가이시마스"
+          ],
+          "starter": "これ、ひとつ... (코레, 히토츠...)",
+          "full": "ホットコーヒーをひとつ、お願いします。(홋토 코-히-오 히토츠, 오네가이시마스.)",
+          "fullKo": "따뜻한 커피 하나 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-1-8",
+        "title": "괜찮아요 & 좋아요 리액션",
+        "role": "관광 안내소 직원",
+        "firstLine": "この地図を差し上げましょうか？",
+        "firstLineRomaji": "Kono chizu o sashiagemashou ka?",
+        "firstLinePhonetic": "코노 치즈오 사시아게마쇼-카?",
+        "firstLineKo": "이 지도를 드릴까요?",
+        "hints": {
+          "words": [
+            "いいですね",
+            "ありがとうございます",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "이이데스네",
+            "아리가토-고자이마스",
+            "오네가이시마스"
+          ],
+          "starter": "あ、いいですね... (아, 이이데스네...)",
+          "full": "あ、いいですね！ぜひお願いします。(아, 이이데스네! 제히 오네가이시마스.)",
+          "fullKo": "아, 좋네요! 꼭 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-1-9",
+        "title": "헤어질 때 인사 (사요나라 & 마타네)",
+        "role": "현지 친구",
+        "firstLine": "今日は楽しかったです！また会いましょうね。",
+        "firstLineRomaji": "Kyou wa tanoshikatta desu! Mata aimashou ne.",
+        "firstLinePhonetic": "쿄-와 타노시캇타데스! 마타 아이마쇼-네.",
+        "firstLineKo": "오늘 즐거웠어요! 또 만나요.",
+        "hints": {
+          "words": [
+            "また会いましょう",
+            "さようなら",
+            "気をつけて"
+          ],
+          "wordsPhonetic": [
+            "마타 아이마쇼-",
+            "사요-나라",
+            "키오츠케테"
+          ],
+          "starter": "はい、また... (하이, 마타...)",
+          "full": "はい、また会いましょう！気をつけて帰ってください。(하이, 마타 아이마쇼-! 키오츠케테 카에텐쿠다사이.)",
+          "fullKo": "네, 또 만나요! 조심히 들어가세요."
+        }
+      },
+      {
+        "id": "ja-1-10",
+        "title": "유닛 1 종합 실전 회화 롤플레잉",
+        "role": "새로 만난 룸메이트",
+        "firstLine": "初日ですね！緊張していますか？何か手伝いましょうか？",
+        "firstLineRomaji": "Shonichi desu ne! Kinchou shiteimasu ka? Nanika tetsudaimashou ka?",
+        "firstLinePhonetic": "쇼니치데스네! 킨쵸- 시테이마스카? 나니카 테츠다이마쇼-카?",
+        "firstLineKo": "첫날이네요! 긴장되시나요? 뭐 도와드릴까요?",
+        "hints": {
+          "words": [
+            "大丈夫です",
+            "ありがとう",
+            "よろしくお願いします"
+          ],
+          "wordsPhonetic": [
+            "다이죠-부데스",
+            "아리가토-",
+            "요로시쿠 오네가이시마스"
+          ],
+          "starter": "大丈夫です、ありがとう... (다이죠-부데스, 아리가토-...)",
+          "full": "大丈夫です、ありがとうございます！これからよろしくお願いします。(다이죠-부데스, 아리가토-고자이마스! 코레카라 요로시쿠 오네가이시마스.)",
+          "fullKo": "괜찮습니다, 감사합니다! 앞으로 잘 부탁드려요."
+        }
+      }
+    ]
+  },
+  "2": {
+    "badge": "UNIT 2 · 식당 서바이벌",
+    "title": "식당 & 카페에서 주문하기",
+    "desc": "일본 여행의 꽃! 인원수 말하기, 메뉴 추천, 계산까지 완벽 마스터",
+    "icon": "🍜",
+    "stages": [
+      {
+        "id": "ja-2-1",
+        "title": "식당 입장 및 인원수 말하기",
+        "role": "라멘 가게 직원",
+        "firstLine": "いらっしゃいませ！何名様ですか？",
+        "firstLineRomaji": "Irasshaimase! Nanmei-sama desu ka?",
+        "firstLinePhonetic": "이랏샤이마세! 난메-사마데스카?",
+        "firstLineKo": "어서 오세요! 몇 분이신가요?",
+        "hints": {
+          "words": [
+            "1人です",
+            "2人です",
+            "カウンターで"
+          ],
+          "wordsPhonetic": [
+            "히토리데스",
+            "후타리데스",
+            "카운타-데"
+          ],
+          "starter": "ひと... (히토...)",
+          "full": "1人です。(히토리데스.) / 2人です。(후타리데스.)",
+          "fullKo": "1명입니다. / 2명입니다."
+        }
+      },
+      {
+        "id": "ja-2-2",
+        "title": "메뉴판 요청하기",
+        "role": "이자카야 직원",
+        "firstLine": "こちらのお席へどうぞ！",
+        "firstLineRomaji": "Kochira no oseki e douzo!",
+        "firstLinePhonetic": "코치라노 오세키에 도-조!",
+        "firstLineKo": "이쪽 자리로 앉으세요!",
+        "hints": {
+          "words": [
+            "メニュー",
+            "英語メニュー",
+            "ください"
+          ],
+          "wordsPhonetic": [
+            "메뉴-",
+            "에-고 메뉴-",
+            "쿠다사이"
+          ],
+          "starter": "すみません、メニューを... (스미마센, 메뉴-오...)",
+          "full": "すみません、メニューをください。(스미마센, 메뉴-오 쿠다사이.)",
+          "fullKo": "저기요, 메뉴판 좀 주세요."
+        }
+      },
+      {
+        "id": "ja-2-3",
+        "title": "'이것 주세요' (코레오 쿠다사이)",
+        "role": "스시 전문점 셰프",
+        "firstLine": "何にいたしましょうか？",
+        "firstLineRomaji": "Nani ni itashimashou ka?",
+        "firstLinePhonetic": "나니니 이타시마쇼-카?",
+        "firstLineKo": "어떤 것으로 하시겠습니까?",
+        "hints": {
+          "words": [
+            "これを",
+            "ふたつ",
+            "ください"
+          ],
+          "wordsPhonetic": [
+            "코레오",
+            "후타츠",
+            "쿠다사이"
+          ],
+          "starter": "これを... (코레오...)",
+          "full": "これをひとつ、お願いします。(코레오 히토츠, 오네가이시마스.)",
+          "fullKo": "이것 하나 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-2-4",
+        "title": "물과 물티슈 추가 요청",
+        "role": "돈가스집 직원",
+        "firstLine": "お待た세いたしました、ヒレカツ定食です。",
+        "firstLineRomaji": "Omatase itashimashita, hirekatsu teishoku desu.",
+        "firstLinePhonetic": "오마타세 이타시마시타, 히레카츠 테-쇼쿠데스.",
+        "firstLineKo": "오래 기다리셨습니다, 히레카츠 정식입니다.",
+        "hints": {
+          "words": [
+            "お水",
+            "おしぼり",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "오미즈",
+            "오시보리",
+            "오네가이시마스"
+          ],
+          "starter": "すみません、お水を... (스미마센, 오미즈오...)",
+          "full": "すみません、お水とおしぼりをもう一つください。(스미마센, 오미즈토 오시보리오 모- 히토츠 쿠다사이.)",
+          "fullKo": "저기요, 물이랑 물티슈 하나 더 주세요."
+        }
+      },
+      {
+        "id": "ja-2-5",
+        "title": "추천 메뉴 묻기 (오스스메와?)",
+        "role": "야키토리 이자카야 사장님",
+        "firstLine": "当店は串焼きが自慢ですよ！",
+        "firstLineRomaji": "Touten wa kushiyaki ga jiman desu yo!",
+        "firstLinePhonetic": "토-텐와 쿠시야키가 지만데스요!",
+        "firstLineKo": "저희 가게는 꼬치구이가 자랑거리랍니다!",
+        "hints": {
+          "words": [
+            "おすすめ",
+            "何ですか",
+            "人気メニュー"
+          ],
+          "wordsPhonetic": [
+            "오스스메",
+            "난데스카",
+            "닌키 메뉴-"
+          ],
+          "starter": "一番のオススメは... (이치반노 오스스메와...)",
+          "full": "一番のおすすめは何ですか？(이치반노 오스스메와 난데스카?)",
+          "fullKo": "가장 추천하는 메뉴는 무엇인가요?"
+        }
+      },
+      {
+        "id": "ja-2-6",
+        "title": "맵기 및 재료 확인하기",
+        "role": "카레 전문점 직원",
+        "firstLine": "辛さはどうなさいますか？",
+        "firstLineRomaji": "Karasa wa dou nasaimasu ka?",
+        "firstLinePhonetic": "카라사와 도- 나사이마스카?",
+        "firstLineKo": "매운맛은 어떻게 해드릴까요?",
+        "hints": {
+          "words": [
+            "あまり辛くない",
+            "普通で",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "아마리 카라쿠나이",
+            "후츠-데",
+            "오네가이시마스"
+          ],
+          "starter": "あまり辛くない... (아마리 카라쿠나이...)",
+          "full": "あまり辛くないものでお願いします。(아마리 카라쿠나이 모노데 오네가이시마스.)",
+          "fullKo": "너무 맵지 않은 것으로 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-2-7",
+        "title": "계산 요청하기 (오카이케이 오네가이시마스)",
+        "role": "패밀리 레스토랑 직원",
+        "firstLine": "お食事はお済みですか？お下げしてもよろしいですか？",
+        "firstLineRomaji": "Oshokuji wa ozumi desu ka? Osage shitemo yoroshii desu ka?",
+        "firstLinePhonetic": "오쇼쿠지와 오즈미데스카? 오사게 시테모 요로시이데스카?",
+        "firstLineKo": "식사는 다 마치셨나요? 그릇 치워드려도 될까요?",
+        "hints": {
+          "words": [
+            "お会計",
+            "お願いします",
+            "ごちそうさま"
+          ],
+          "wordsPhonetic": [
+            "오카이케이",
+            "오네가이시마스",
+            "고치소-사마"
+          ],
+          "starter": "はい、お会計を... (하이, 오카이케이오...)",
+          "full": "はい、お会計をお願いします。(하이, 오카이케이오 오네가이시마스.)",
+          "fullKo": "네, 계산 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-2-8",
+        "title": "신용카드 결제 확인",
+        "role": "계산대 직원",
+        "firstLine": "お会計、合計で3,500円になります。",
+        "firstLineRomaji": "Okaikei, goukei de sanzen gohyaku-en ni narimasu.",
+        "firstLinePhonetic": "오카이케이, 고-케이데 산젠 고햐쿠엔니 나리마스.",
+        "firstLineKo": "계산, 합계 3,500엔입니다.",
+        "hints": {
+          "words": [
+            "カード",
+            "使えますか",
+            "現金で"
+          ],
+          "wordsPhonetic": [
+            "카-도",
+            "츠카에마스카",
+            "겐킨데"
+          ],
+          "starter": "クレジットカードは... (쿠레짓토 카-도와...)",
+          "full": "クレジットカードは使えますか？(쿠레짓토 카-도와 츠카에마스카?)",
+          "fullKo": "신용카드 사용할 수 있나요?"
+        }
+      },
+      {
+        "id": "ja-2-9",
+        "title": "잘 먹었습니다 (고치소-사마)",
+        "role": "나가는 손님을 배웅하는 사장님",
+        "firstLine": "ありがとうございました！またお越しください！",
+        "firstLineRomaji": "Arigatou gozaimashita! Mata okoshi kudasai!",
+        "firstLinePhonetic": "아리가토- 고자이마시타! 마타 오코시 쿠다사이!",
+        "firstLineKo": "감사했습니다! 또 찾아주세요!",
+        "hints": {
+          "words": [
+            "ごちそうさまでした",
+            "とてもおいしかった",
+            "また来ます"
+          ],
+          "wordsPhonetic": [
+            "고치소-사마데시타",
+            "토테모 오이시캇타",
+            "마타 키마스"
+          ],
+          "starter": "ごちそうさまでした... (고치소-사마데시타...)",
+          "full": "ごちそうさまでした！とても美味しかったです。(고치소-사마데시타! 토테모 오이시캇타데스.)",
+          "fullKo": "잘 먹었습니다! 정말 맛있었어요."
+        }
+      },
+      {
+        "id": "ja-2-10",
+        "title": "유닛 2 식당 종합 실전 롤플레잉",
+        "role": "우동 전문점 점장",
+        "firstLine": "いらっしゃいませ！温かいうどんと冷たいうどん、どちらにしますか？",
+        "firstLineRomaji": "Irasshaimase! Atatakai udon to tsumetai udon, dochira ni shimasu ka?",
+        "firstLinePhonetic": "이랏샤이마세! 아타타카이 우돈토 츠메타이 우돈, 도치라니 시마스카?",
+        "firstLineKo": "어서 오세요! 따뜻한 우동과 차가운 우동, 어느 쪽으로 하시겠어요?",
+        "hints": {
+          "words": [
+            "温かい",
+            "天ぷらうどん",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "아타타카이",
+            "텐푸라 우돈",
+            "오네가이시마스"
+          ],
+          "starter": "温かい... (아타타카이...)",
+          "full": "温かい天ぷらうどんをひとつ、お願いします。(아타타카이 텐푸라 우돈오 히토츠, 오네가이시마스.)",
+          "fullKo": "따뜻한 튀김 우동 하나 부탁드립니다."
+        }
+      }
+    ]
+  },
+  "3": {
+    "badge": "UNIT 3 · 길 찾기 & 교통",
+    "title": "길 묻기 & 대중교통 이용",
+    "desc": "역 위치, 지하철 환승, 티켓 발권, 화장실 찾기 서바이벌",
+    "icon": "🚇",
+    "stages": [
+      {
+        "id": "ja-3-1",
+        "title": "길 묻기 시작 (스미마센, ~와 도코데스카)",
+        "role": "역 앞 경찰관(코반)",
+        "firstLine": "こんにちは！どうかなさいましたか？",
+        "firstLineRomaji": "Konnichiwa! Dou ka nasaimashita ka?",
+        "firstLinePhonetic": "콘니치와! 도-카 나사이마시타카?",
+        "firstLineKo": "안녕하세요! 무슨 일이 있으신가요?",
+        "hints": {
+          "words": [
+            "すみません",
+            "駅",
+            "どこですか"
+          ],
+          "wordsPhonetic": [
+            "스미마센",
+            "에키",
+            "도코데스카"
+          ],
+          "starter": "すみません、新宿駅は... (스미마센, 신주쿠에키와...)",
+          "full": "すみません、新宿駅はどこですか？(스미마센, 신주쿠에키와 도코데스카?)",
+          "fullKo": "저기요, 신주쿠역은 어디에 있나요?"
+        }
+      },
+      {
+        "id": "ja-3-2",
+        "title": "지하철역 출구 찾기",
+        "role": "지하철 역무원",
+        "firstLine": "何かお困りですか？",
+        "firstLineRomaji": "Nanika okomari desu ka?",
+        "firstLinePhonetic": "나니카 오코마리데스카?",
+        "firstLineKo": "도움이 필요하신가요?",
+        "hints": {
+          "words": [
+            "東口",
+            "出口",
+            "どちらですか"
+          ],
+          "wordsPhonetic": [
+            "히가시구치",
+            "데구치",
+            "도치라데스카"
+          ],
+          "starter": "東口の出口は... (히가시구치노 데구치와...)",
+          "full": "東口の出口はどちらですか？(히가시구치노 데구치와 도치라데스카?)",
+          "fullKo": "동쪽 출구는 어느 쪽인가요?"
+        }
+      },
+      {
+        "id": "ja-3-3",
+        "title": "지하철 티켓 사기",
+        "role": "티켓 발권기 앞 도우미",
+        "firstLine": "切符の買い方は分かりますか？",
+        "firstLineRomaji": "Kippu no kaikata wa wakarimasu ka?",
+        "firstLinePhonetic": "킵푸노 카이카타와 와카리마스카?",
+        "firstLineKo": "표 사는 법 아시나요?",
+        "hints": {
+          "words": [
+            "渋谷まで",
+            "切符",
+            "買いたいです"
+          ],
+          "wordsPhonetic": [
+            "시부야마데",
+            "킵푸",
+            "카이타이데스"
+          ],
+          "starter": "渋谷までの... (시부야마데노...)",
+          "full": "渋谷までの切符を1枚買いたいです。(시부야마데노 킵푸오 이치마이 카이타이데스.)",
+          "fullKo": "시부야까지 가는 표 한 장 사고 싶어요."
+        }
+      },
+      {
+        "id": "ja-3-4",
+        "title": "이 전철이 가나요? (확인하기)",
+        "role": "플랫폼 승객",
+        "firstLine": "まもなく電車が参りますよ。",
+        "firstLineRomaji": "Mamonaku densha ga mairimasu yo.",
+        "firstLinePhonetic": "마모나쿠 덴샤가 마이리마스요.",
+        "firstLineKo": "곧 열차가 들어옵니다.",
+        "hints": {
+          "words": [
+            "この電車",
+            "東京駅",
+            "行きますか"
+          ],
+          "wordsPhonetic": [
+            "코노 덴샤",
+            "토-쿄-에키",
+            "이키마스카"
+          ],
+          "starter": "すみません、この電車は... (스미마센, 코노 덴샤와...)",
+          "full": "すみません、この電車は東京駅に行きますか？(스미마센, 코노 덴샤와 토-쿄-에키니 이키마스카?)",
+          "fullKo": "저기요, 이 열차가 도쿄역에 가나요?"
+        }
+      },
+      {
+        "id": "ja-3-5",
+        "title": "방향 묻기 (직진 / 좌회전 / 우회전)",
+        "role": "길을 알려주는 행인",
+        "firstLine": "郵便局をお探しですか？",
+        "firstLineRomaji": "Yuubinkyoku o osagashi desu ka?",
+        "firstLinePhonetic": "유-빈쿄쿠오 오사가시데스카?",
+        "firstLineKo": "우체국을 찾고 계신가요?",
+        "hints": {
+          "words": [
+            "まっすぐ",
+            "左",
+            "右"
+          ],
+          "wordsPhonetic": [
+            "맛스구",
+            "히다리",
+            "미기"
+          ],
+          "starter": "ここからまっすぐ... (코코카라 맛스구...)",
+          "full": "ここからまっすぐ行って、右に曲がりますか？(코코카라 맛스구 잇테, 미기니 마가리마스카?)",
+          "fullKo": "여기서 곧장 가서, 오른쪽으로 도나요?"
+        }
+      },
+      {
+        "id": "ja-3-6",
+        "title": "도보 소요 시간 묻기",
+        "role": "호텔 프론트 직원",
+        "firstLine": "観光地のご案内でしょうか？",
+        "firstLineRomaji": "Kankouchi no goannai deshō ka?",
+        "firstLinePhonetic": "칸코-치노 고안나이데쇼-카?",
+        "firstLineKo": "관광지 안내가 필요하신가요?",
+        "hints": {
+          "words": [
+            "歩いて",
+            "何分くらい",
+            "かかりますか"
+          ],
+          "wordsPhonetic": [
+            "아루이테",
+            "난푼쿠라이",
+            "카카리마스카"
+          ],
+          "starter": "歩いて... (아루이테...)",
+          "full": "歩いて何分くらいかかりますか？(아루이테 난푼쿠라이 카카리마스카?)",
+          "fullKo": "걸어서 몇 분 정도 걸리나요?"
+        }
+      },
+      {
+        "id": "ja-3-7",
+        "title": "택시 타고 목적지 말하기",
+        "role": "친절한 일본 택시 기사님",
+        "firstLine": "ご乗車ありがとうございます！どちらまで行かれますか？",
+        "firstLineRomaji": "Gojousha arigatou gozaimasu! Dochira made ikaremasu ka?",
+        "firstLinePhonetic": "고죠-샤 아리가토-고자이마스! 도치라마데 이카레마스카?",
+        "firstLineKo": "탑승해 주셔서 감사합니다! 어디까지 가시나요?",
+        "hints": {
+          "words": [
+            "東京タワー",
+            "ここまで",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "토-쿄- 타와-",
+            "코코마데",
+            "오네가이시마스"
+          ],
+          "starter": "東京タワーまで... (토-쿄- 타와-마데...)",
+          "full": "東京タワーまでお願いします。(토-쿄- 타와-마데 오네가이시마스.)",
+          "fullKo": "도쿄타워까지 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-3-8",
+        "title": "가까운 편의점 위치 묻기",
+        "role": "지하철 앞 청년",
+        "firstLine": "はい、何でしょうか？",
+        "firstLineRomaji": "Hai, nan deshō ka?",
+        "firstLinePhonetic": "하이, 난데쇼-카?",
+        "firstLineKo": "네, 무엇인가요?",
+        "hints": {
+          "words": [
+            "近くに",
+            "コンビニ",
+            "ありますか"
+          ],
+          "wordsPhonetic": [
+            "치카쿠니",
+            "콘비니",
+            "아리마스카"
+          ],
+          "starter": "この近くに... (코노 치카쿠니...)",
+          "full": "この近くにコンビニはありますか？(코노 치카쿠니 콘비니와 아리마스카?)",
+          "fullKo": "이 근처에 편의점이 있나요?"
+        }
+      },
+      {
+        "id": "ja-3-9",
+        "title": "화장실 위치 묻기 (토이레와 도코?)",
+        "role": "백화점 안내 데스크 직원",
+        "firstLine": "いらっしゃいませ！ご案内いたします。",
+        "firstLineRomaji": "Irasshaimase! Goannai itashimasu.",
+        "firstLinePhonetic": "이랏샤이마세! 고안나이 이타시마스.",
+        "firstLineKo": "어서 오세요! 안내해 드리겠습니다.",
+        "hints": {
+          "words": [
+            "トイレ",
+            "どこですか",
+            "お手洗い"
+          ],
+          "wordsPhonetic": [
+            "토이레",
+            "도코데스카",
+            "오테아라이"
+          ],
+          "starter": "すみません、お手洗いは... (스미마센, 오테아라이와...)",
+          "full": "すみません、トイレはどこですか？(스미마센, 토이레와 도코데스카?)",
+          "fullKo": "저기요, 화장실은 어디에 있나요?"
+        }
+      },
+      {
+        "id": "ja-3-10",
+        "title": "유닛 3 길 찾기 종합 실전 롤플레잉",
+        "role": "친절한 도쿄 시민",
+        "firstLine": "道に迷われましたか？大丈夫ですか？",
+        "firstLineRomaji": "Michi ni mayowaremashita ka? Daijoubu desu ka?",
+        "firstLinePhonetic": "미치니 마요와레마시타카? 다이죠-부데스카?",
+        "firstLineKo": "길을 잃으셨나요? 괜찮으세요?",
+        "hints": {
+          "words": [
+            "浅草寺",
+            "どう行けば",
+            "いいですか"
+          ],
+          "wordsPhonetic": [
+            "센소-지",
+            "도- 이케바",
+            "이이데스카"
+          ],
+          "starter": "浅草寺に行きたいのですが... (센소-지니 이키타이노데스가...)",
+          "full": "浅草寺に行きたいのですが、どう行けばいいですか？(센소-지니 이키타이노데스가, 도- 이케바 이이데스카?)",
+          "fullKo": "센소지에 가고 싶은데, 어떻게 가면 되나요?"
+        }
+      }
+    ]
+  },
+  "4": {
+    "badge": "UNIT 4 · 쇼핑 & 편의점",
+    "title": "편의점 & 쇼핑하기",
+    "desc": "봉투 유무, 도시락 데우기, 가격 묻기, 면세(Tax-Free) 요청",
+    "icon": "🛍️",
+    "stages": [
+      {
+        "id": "ja-4-1",
+        "title": "편의점 봉투 필요 여부 (후쿠로)",
+        "role": "편의점 아르바이트생",
+        "firstLine": "袋はお付けしますか？",
+        "firstLineRomaji": "Fukuro wa otsuke shimasu ka?",
+        "firstLinePhonetic": "후쿠로와 오츠케 시마스카?",
+        "firstLineKo": "봉투 넣어드릴까요?",
+        "hints": {
+          "words": [
+            "袋はいりません",
+            "大丈夫です",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "후쿠로와 이리마센",
+            "다이죠-부데스",
+            "오네가이시마스"
+          ],
+          "starter": "あ、袋は... (아, 후쿠로와...)",
+          "full": "あ、袋はいりません。大丈夫です。(아, 후쿠로와 이리마센. 다이죠-부데스.)",
+          "fullKo": "아, 봉투는 필요 없어요. 괜찮습니다."
+        }
+      },
+      {
+        "id": "ja-4-2",
+        "title": "도시락 데우기 부탁",
+        "role": "편의점 직원",
+        "firstLine": "お弁当はこちらで温めますか？",
+        "firstLineRomaji": "Obentou wa kochira de atatamemasu ka?",
+        "firstLinePhonetic": "오벤토-와 코치라데 아타타메마스카?",
+        "firstLineKo": "도시락 여기서 데워드릴까요?",
+        "hints": {
+          "words": [
+            "温めて",
+            "ください",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "아타타메테",
+            "쿠다사이",
+            "오네가이시마스"
+          ],
+          "starter": "はい、温めて... (하이, 아타타메테...)",
+          "full": "はい、温めてください。お願いします。(하이, 아타타메테 쿠다사이. 오네가이시마스.)",
+          "fullKo": "네, 데워주세요. 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-4-3",
+        "title": "가격 묻기 (코레와 이쿠라데스카)",
+        "role": "기념품점 직원",
+        "firstLine": "気になるものがございましたら、お声がけください！",
+        "firstLineRomaji": "Ki ni naru mono ga gozaimashitara, okoegake kudasai!",
+        "firstLinePhonetic": "키니 나루 모노가 고자이마시타라, 오코에가케 쿠다사이!",
+        "firstLineKo": "마음에 드는 물건이 있으시면 말씀해 주세요!",
+        "hints": {
+          "words": [
+            "これ",
+            "いくらですか",
+            "値段"
+          ],
+          "wordsPhonetic": [
+            "코레",
+            "이쿠라데스카",
+            "네단"
+          ],
+          "starter": "すみません、これは... (스미마센, 코레와...)",
+          "full": "すみません、これはいくらですか？(스미마센, 코레와 이쿠라데스카?)",
+          "fullKo": "저기요, 이것은 얼마인가요?"
+        }
+      },
+      {
+        "id": "ja-4-4",
+        "title": "다른 사이즈나 색상 묻기",
+        "role": "옷가게 직원",
+        "firstLine": "サイズはいかがですか？",
+        "firstLineRomaji": "Saizu wa ikaga desu ka?",
+        "firstLinePhonetic": "사이즈와 이카가데스카?",
+        "firstLineKo": "사이즈는 어떠신가요?",
+        "hints": {
+          "words": [
+            "もっと大きい",
+            "サイズ",
+            "ありますか"
+          ],
+          "wordsPhonetic": [
+            "못토 오오키이",
+            "사이즈",
+            "아리마스카"
+          ],
+          "starter": "もう少し大きい... (모- 스코시 오오키이...)",
+          "full": "もう少し大きいサイズはありますか？(모- 스코시 오오키이 사이즈와 아리마스카?)",
+          "fullKo": "조금 더 큰 사이즈가 있나요?"
+        }
+      },
+      {
+        "id": "ja-4-5",
+        "title": "시착해보기 (입어봐도 되나요?)",
+        "role": "의류 매장 직원",
+        "firstLine": "お客様、気になるジャケットはお決まりですか？",
+        "firstLineRomaji": "Okyakusama, ki ni naru jaketto wa okimari desu ka?",
+        "firstLinePhonetic": "오캬쿠사마, 키니 나루 자켓토와 오키마리데스카?",
+        "firstLineKo": "손님, 마음에 드는 재킷 정하셨나요?",
+        "hints": {
+          "words": [
+            "試着",
+            "してもいいですか",
+            "試着室"
+          ],
+          "wordsPhonetic": [
+            "시착쿠",
+            "시테모 이이데스카",
+            "시착쿠시츠"
+          ],
+          "starter": "これ、試着して... (코레, 시착쿠시테...)",
+          "full": "これ、試着してもいいですか？(코레, 시착쿠시테모 이이데스카?)",
+          "fullKo": "이거 입어봐도 될까요?"
+        }
+      },
+      {
+        "id": "ja-4-6",
+        "title": "면세(Tax-Free) 가능한지 묻기",
+        "role": "드럭스토어 계산대 직원",
+        "firstLine": "合計で8,000円になります。",
+        "firstLineRomaji": "Goukei de hassen-en ni narimasu.",
+        "firstLinePhonetic": "고-케이데 핫센엔니 나리마스.",
+        "firstLineKo": "합계 8,000엔입니다.",
+        "hints": {
+          "words": [
+            "免税",
+            "できますか",
+            "パスポート"
+          ],
+          "wordsPhonetic": [
+            "멘제이",
+            "데키마스카",
+            "파스포-토"
+          ],
+          "starter": "あの、免税は... (아노, 멘제이와...)",
+          "full": "あの、免税はできますか？パスポートがあります。(아노, 멘제이와 데키마스카? 파스포-토가 아리마스.)",
+          "fullKo": "저기, 면세(Tax-free) 가능한가요? 여권이 있습니다."
+        }
+      },
+      {
+        "id": "ja-4-7",
+        "title": "영수증 받기",
+        "role": "전자상가 직원",
+        "firstLine": "お支払い完了いたしました！",
+        "firstLineRomaji": "Oshiharai kanryou itashimashita!",
+        "firstLinePhonetic": "오시하라이 칸료- 이타시마시타!",
+        "firstLineKo": "결제 완료되었습니다!",
+        "hints": {
+          "words": [
+            "レシート",
+            "領収書",
+            "ください"
+          ],
+          "wordsPhonetic": [
+            "레시-토",
+            "료-슈-쇼",
+            "쿠다사이"
+          ],
+          "starter": "レシートを... (레시-토오...)",
+          "full": "レシートをください。(레시-토오 쿠다사이.)",
+          "fullKo": "영수증 주세요."
+        }
+      },
+      {
+        "id": "ja-4-8",
+        "title": "새 제품 있는지 확인하기",
+        "role": "기념품 매장 점원",
+        "firstLine": "こちらの展示品でよろしいですか？",
+        "firstLineRomaji": "Kochira no tenjihin de yoroshii desu ka?",
+        "firstLinePhonetic": "코치라노 텐지힌데 요로시이데스카?",
+        "firstLineKo": "이 전시 상품으로 괜찮으실까요?",
+        "hints": {
+          "words": [
+            "新しいもの",
+            "在庫",
+            "ありますか"
+          ],
+          "wordsPhonetic": [
+            "아타라시이 모노",
+            "자이코",
+            "아리마스카"
+          ],
+          "starter": "新しいものは... (아타라시이 모노와...)",
+          "full": "新しい在庫はありますか？(아타라시이 자이코와 아리마스카?)",
+          "fullKo": "새 재고(새 제품)가 있나요?"
+        }
+      },
+      {
+        "id": "ja-4-9",
+        "title": "선물용 포장 부탁하기",
+        "role": "과자점 직원",
+        "firstLine": "ご自宅用でしょうか？",
+        "firstLineRomaji": "Gojitakuyou deshō ka?",
+        "firstLinePhonetic": "고지타쿠요-데쇼-카?",
+        "firstLineKo": "자택에서 드실 용도인가요?",
+        "hints": {
+          "words": [
+            "プレゼント用",
+            "包んで",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "푸레젠토요-",
+            "츠츤데",
+            "오네가이시마스"
+          ],
+          "starter": "プレゼント用で... (푸레젠토요-데...)",
+          "full": "プレゼント用でラッピングをお願いします。(푸레젠토요-데 랍핑구오 오네가이시마스.)",
+          "fullKo": "선물용으로 포장 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-4-10",
+        "title": "유닛 4 쇼핑 종합 실전 롤플레잉",
+        "role": "도쿄 백화점 매니저",
+        "firstLine": "いらっしゃいませ！本日限定のセール商品もございますよ。",
+        "firstLineRomaji": "Irasshaimase! Honjitsu gentei no seeru shouhin mo gozaimasu yo.",
+        "firstLinePhonetic": "이랏샤이마세! 혼지츠 겐테이노 세-루 쇼-힌모 고자이마스요.",
+        "firstLineKo": "어서 오세요! 오늘 한정 세일 상품도 있답니다.",
+        "hints": {
+          "words": [
+            "見てみます",
+            "これにします",
+            "ありがとう"
+          ],
+          "wordsPhonetic": [
+            "미테미마스",
+            "코레니 시마스",
+            "아리가토-"
+          ],
+          "starter": "少し見てみます... (스코시 미테미마스...)",
+          "full": "少し見てみます。ありがとうございます！(스코시 미테미마스. 아리가토-고자이마스!)",
+          "fullKo": "조금 둘러볼게요. 감사합니다!"
+        }
+      }
+    ]
+  },
+  "5": {
+    "badge": "UNIT 5 · 숙소 서바이벌",
+    "title": "호텔 & 료칸 이용하기",
+    "desc": "체크인/체크아웃, 짐 맡기기, 와이파이, 조식 문의 마스터",
+    "icon": "🏨",
+    "stages": [
+      {
+        "id": "ja-5-1",
+        "title": "호텔 체크인 (예약자 이름 말하기)",
+        "role": "호텔 프론트 직원",
+        "firstLine": "いらっしゃいませ！チェックインでございますか？",
+        "firstLineRomaji": "Irasshaimase! Chekkuin de gozaimasu ka?",
+        "firstLinePhonetic": "이랏샤이마세! 첵쿠인데 고자이마스카?",
+        "firstLineKo": "어서 오세요! 체크인이신가요?",
+        "hints": {
+          "words": [
+            "予約した",
+            "チェックイン",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "요야쿠 시타",
+            "첵쿠인",
+            "오네가이시마스"
+          ],
+          "starter": "はい、予約した... (하이, 요야쿠 시타...)",
+          "full": "はい、予約したキムです。チェックインをお願いします。(하이, 요야쿠 시타 키무데스. 첵쿠인오 오네가이시마스.)",
+          "fullKo": "네, 예약한 김입니다. 체크인 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-5-2",
+        "title": "체크인 전 짐 맡기기",
+        "role": "프론트 데스크 직원",
+        "firstLine": "チェックインは15時からとなっております。",
+        "firstLineRomaji": "Chekkuin wa juugoji kara to natte orimasu.",
+        "firstLinePhonetic": "첵쿠인와 주-고지카라토 낫테 오리마스.",
+        "firstLineKo": "체크인은 오후 3시부터 가능합니다.",
+        "hints": {
+          "words": [
+            "荷物",
+            "預かって",
+            "もらえますか"
+          ],
+          "wordsPhonetic": [
+            "니모츠",
+            "아즈캇테",
+            "모라에마스카"
+          ],
+          "starter": "チェックインまで荷物を... (첵쿠인마데 니모츠오...)",
+          "full": "チェックインまで荷物を預かってもらえますか？(첵쿠인마데 니모츠오 아즈캇테 모라에마스카?)",
+          "fullKo": "체크인 시간까지 짐을 좀 맡아주실 수 있나요?"
+        }
+      },
+      {
+        "id": "ja-5-3",
+        "title": "Wi-Fi 비밀번호 묻기",
+        "role": "호텔 안내 데스크",
+        "firstLine": "お部屋の鍵でございます。他にご不明な点はございますか？",
+        "firstLineRomaji": "Oheya no kagi de gozaimasu. Hoka ni gofumei na ten wa gozaimasu ka?",
+        "firstLinePhonetic": "오헤야노 카기데 고자이마스. 호카니 고후메이나 텐와 고자이마스카?",
+        "firstLineKo": "방 열쇠입니다. 다른 궁금한 점 있으신가요?",
+        "hints": {
+          "words": [
+            "Wi-Fi",
+            "パスワード",
+            "何ですか"
+          ],
+          "wordsPhonetic": [
+            "와이파이",
+            "파스와-도",
+            "난데스카"
+          ],
+          "starter": "Wi-Fiのパスワードは... (와이파이노 파스와-도와...)",
+          "full": "Wi-Fiのパスワードは何ですか？(와이파이노 파스와-도와 난데스카?)",
+          "fullKo": "와이파이 비밀번호는 무엇인가요?"
+        }
+      },
+      {
+        "id": "ja-5-4",
+        "title": "조식 시간 및 장소 확인",
+        "role": "호텔 매니저",
+        "firstLine": "朝食付きのプランでご予約いただいております。",
+        "firstLineRomaji": "Choushoku tsuki no puran de goyoyaku itadaite orimasu.",
+        "firstLinePhonetic": "쵸-쇼쿠 츠키노 푸란데 고요야쿠 이타다이테 오리마스.",
+        "firstLineKo": "조식이 포함된 플랜으로 예약되어 있으십니다.",
+        "hints": {
+          "words": [
+            "朝食",
+            "何時から",
+            "どこですか"
+          ],
+          "wordsPhonetic": [
+            "쵸-쇼쿠",
+            "난지카라",
+            "도코데스카"
+          ],
+          "starter": "朝食は何時から... (쵸-쇼쿠와 난지카라...)",
+          "full": "朝食は何時からですか？場所はどこですか？(쵸-쇼쿠와 난지카라데스카? 바쇼와 도코데스카?)",
+          "fullKo": "조식은 몇 시부터인가요? 장소는 어디인가요?"
+        }
+      },
+      {
+        "id": "ja-5-5",
+        "title": "수건 추가 요청하기",
+        "role": "하우스키핑 직원",
+        "firstLine": "はい、フロントでございます。どうなさいましたか？",
+        "firstLineRomaji": "Hai, furonto de gozaimasu. Dou nasaimashita ka?",
+        "firstLinePhonetic": "하이, 후론토데 고자이마스. 도- 나사이마시타카?",
+        "firstLineKo": "네, 프론트입니다. 무슨 일이신가요?",
+        "hints": {
+          "words": [
+            "タオル",
+            "もう1枚",
+            "お願いします"
+          ],
+          "wordsPhonetic": [
+            "타오루",
+            "모- 이치마이",
+            "오네가이시마스"
+          ],
+          "starter": "すみません、タオルを... (스미마센, 타오루오...)",
+          "full": "すみません、バスタオルをもう1枚お願いします。(스미마센, 바스타오루오 모- 이치마이 오네가이시마스.)",
+          "fullKo": "저기요, 바디 타월 한 장 더 부탁드립니다."
+        }
+      },
+      {
+        "id": "ja-5-6",
+        "title": "에어컨 / 난방 조작법 문의",
+        "role": "호텔 직원",
+        "firstLine": "お部屋の設備で分からないことはございますか？",
+        "firstLineRomaji": "Oheya no setsubi de wakaranai koto wa gozaimasu ka?",
+        "firstLinePhonetic": "오헤야노 세츠비데 와카라나이 코토와 고자이마스카?",
+        "firstLineKo": "객실 설비 중 잘 모르시는 점이 있으신가요?",
+        "hints": {
+          "words": [
+            "エアコン",
+            "使い方",
+            "教えてください"
+          ],
+          "wordsPhonetic": [
+            "에아콘",
+            "츠카이카타",
+            "오시에테 쿠다사이"
+          ],
+          "starter": "エアコンの使い方が... (에아콘노 츠카이카타가...)",
+          "full": "エアコンの使い方を教えてください。(에아콘노 츠카이카타오 오시에테 쿠다사이.)",
+          "fullKo": "에어컨(난방) 사용법을 알려주세요."
+        }
+      },
+      {
+        "id": "ja-5-7",
+        "title": "온천(료칸) 이용 시간 묻기",
+        "role": "전통 료칸 여관주인(오카미상)",
+        "firstLine": "ようこそ当館へ！温泉もご用意しております。",
+        "firstLineRomaji": "Youkoso toukan e! Onsen mo goyoui shite orimasu.",
+        "firstLinePhonetic": "요-코소 토-칸에! 온센모 고요-이 시테 오리마스.",
+        "firstLineKo": "저희 여관에 오신 것을 환영합니다! 온천도 준비되어 있습니다.",
+        "hints": {
+          "words": [
+            "温泉",
+            "何時まで",
+            "入れますか"
+          ],
+          "wordsPhonetic": [
+            "온센",
+            "난지마데",
+            "하이레마스카"
+          ],
+          "starter": "温泉は何時まで... (온센와 난지마데...)",
+          "full": "温泉は何時まで入れますか？(온센와 난지마데 하이레마스카?)",
+          "fullKo": "온천은 몇 시까지 들어갈 수 있나요?"
+        }
+      },
+      {
+        "id": "ja-5-8",
+        "title": "호텔 체크아웃하기",
+        "role": "프론트 매니저",
+        "firstLine": "おはようございます！チェックアウトでございますか？",
+        "firstLineRomaji": "Ohayou gozaimasu! Chekkuauto de gozaimasu ka?",
+        "firstLinePhonetic": "오하요- 고자이마스! 첵쿠아우토데 고자이마스카?",
+        "firstLineKo": "좋은 아침입니다! 체크아웃이신가요?",
+        "hints": {
+          "words": [
+            "チェックアウト",
+            "鍵",
+            "お世話になりました"
+          ],
+          "wordsPhonetic": [
+            "첵쿠아우토",
+            "카기",
+            "오세와니 나리마시타"
+          ],
+          "starter": "はい、チェックアウトを... (하이, 첵쿠아우토오...)",
+          "full": "はい、チェックアウトをお願いします。お世話になりました！(하이, 첵쿠아우토오 오네가이시마스. 오세와니 나리마시타!)",
+          "fullKo": "네, 체크아웃 부탁드립니다. 신세 많이 졌습니다!"
+        }
+      },
+      {
+        "id": "ja-5-9",
+        "title": "택시 호출 부탁하기",
+        "role": "호텔 로비 도어맨",
+        "firstLine": "お荷物をお持ちしましょうか？これからどちらへ？",
+        "firstLineRomaji": "Onimotsu o omochi shimashou ka? Korekara dochira e?",
+        "firstLinePhonetic": "오니모츠오 오모치 시마쇼-카? 코레카라 도치라에?",
+        "firstLineKo": "짐을 들어드릴까요? 이제 어디로 가시나요?",
+        "hints": {
+          "words": [
+            "タクシー",
+            "呼んで",
+            "ください"
+          ],
+          "wordsPhonetic": [
+            "타쿠시-",
+            "욘데",
+            "쿠다사이"
+          ],
+          "starter": "空港まで行きたいので、タクシーを... (쿠-코-마데 이키타이노데, 타쿠시-오...)",
+          "full": "空港までタクシーを1台呼んでいただけますか？(쿠-코-마데 타쿠시-오 이치다이 욘데 이타다케마스카?)",
+          "fullKo": "공항까지 택시 한 대 불러주실 수 있나요?"
+        }
+      },
+      {
+        "id": "ja-5-10",
+        "title": "유닛 5 숙소 종합 실전 롤플레잉",
+        "role": "고급 료칸 스태프",
+        "firstLine": "ご滞在はいかがでしたでしょうか？快適に過ごせましたか？",
+        "firstLineRomaji": "Gotouzai wa ikaga deshita deshō ka? Kaiteki ni sugosemashita ka?",
+        "firstLinePhonetic": "고타이ざ이와 이카가데시타데쇼-카? 카이테키니 수고사마시타카?",
+        "firstLineKo": "머무시는 동안 어떠셨나요? 편안하게 보내셨나요?",
+        "hints": {
+          "words": [
+            "最高でした",
+            "また来ます",
+            "ありがとうございました"
+          ],
+          "wordsPhonetic": [
+            "사이코-데시타",
+            "마타 키마스",
+            "아리가토-고자이마스"
+          ],
+          "starter": "本当に最高でした... (혼토-니 사이코-데시타...)",
+          "full": "本当に最高でした！温泉もお料理も素晴らしかったです。(혼토-니 사이코-데시타! 온센모 오료-리모 스바라시캇타데스.)",
+          "fullKo": "정말 최고였어요! 온천도 요리도 훌륭했습니다."
+        }
+      }
+    ]
+  }
+};
+
+  function getActiveRoadmap() {
+    if (currentProfile && currentProfile.targetLang === 'ja') {
+      return ROADMAP_DATA_JA;
+    }
+    return ROADMAP_DATA;
+  }
+
+  function getActiveUnitsCount() {
+    return (currentProfile && currentProfile.targetLang === 'ja') ? 5 : 10;
+  }
+
+  function toggleCurrentLanguage() {
+    if (!currentProfile) return;
+    const nextLang = (currentProfile.targetLang === 'ja') ? 'en' : 'ja';
+    currentProfile.targetLang = nextLang;
+    const maxLvl = getActiveUnitsCount();
+    if ((currentProfile.level || 1) > maxLvl) {
+      currentProfile.level = 1;
+    }
+    saveProfiles();
+    updateHeaderStats();
+    renderMapNodes();
+
+    // If currently on reading tab, re-render reading view
+    const mainReadingView = document.getElementById('mainReadingView');
+    if (mainReadingView && mainReadingView.style.display !== 'none') {
+      filterReadingArticles(currentReadingLevelFilter || 'my');
+    }
+    playChime();
+    const langBadge = (nextLang === 'ja') ? '🇯🇵 일본어 왕초보 회화 (50 스테이지)' : '🇺🇸 영어 회화 & 리딩 (100 스테이지 + 300 아티클)';
+    showToast(`${langBadge} 모드로 전환되었습니다! 🦉`);
+  }
+
+
   const READING_ARTICLES = [
   {
     "id": "art-1",
@@ -21689,15 +23005,29 @@
   let welcomeSelectedAvatar = '🦉';
   let welcomeSelectedLevel = 1;
   let welcomeSelectedDictLang = 'ko';
+  let welcomeSelectedTargetLang = 'en';
+
+  function selectWelcomeTargetLang(lang) {
+    welcomeSelectedTargetLang = lang;
+    const enCard = document.getElementById('welcomeLangTargetEn');
+    const jaCard = document.getElementById('welcomeLangTargetJa');
+    if (enCard) enCard.classList.toggle('selected', lang === 'en');
+    if (jaCard) jaCard.classList.toggle('selected', lang === 'ja');
+    if (lang === 'ja' && welcomeSelectedLevel > 5) welcomeSelectedLevel = 1;
+    renderWelcomeLevels();
+    playClickSound();
+  }
 
   function openWelcomeModal() {
     welcomeSelectedAvatar = '🦉';
     welcomeSelectedLevel = 1;
     welcomeSelectedDictLang = 'ko';
+    welcomeSelectedTargetLang = 'en';
     document.getElementById('welcomeProfileName').value = "";
     document.querySelectorAll('#welcomeAvatarPicker .avatar-opt').forEach(el => {
       el.classList.toggle('selected', el.innerText.trim() === '🦉');
     });
+    selectWelcomeTargetLang('en');
     selectWelcomeDictLang('ko');
     renderWelcomeLevels();
     document.getElementById('welcomeModal').classList.add('active');
@@ -21721,9 +23051,16 @@
 
   function renderWelcomeLevels() {
     const grid = document.getElementById('welcomeLevelGrid');
+    if (!grid) return;
     grid.innerHTML = "";
-    for (let lvl = 1; lvl <= 10; lvl++) {
-      const data = ROADMAP_DATA[lvl];
+    const isJa = (welcomeSelectedTargetLang === 'ja');
+    const roadmap = isJa ? ROADMAP_DATA_JA : ROADMAP_DATA;
+    const maxLvl = isJa ? 5 : 10;
+    if (welcomeSelectedLevel > maxLvl) welcomeSelectedLevel = 1;
+
+    for (let lvl = 1; lvl <= maxLvl; lvl++) {
+      const data = roadmap[lvl];
+      if (!data) continue;
       const isSel = (lvl === welcomeSelectedLevel);
       const card = document.createElement('div');
       card.className = `level-card-opt ${isSel ? 'selected' : ''}`;
@@ -21732,7 +23069,7 @@
         renderWelcomeLevels();
         playClickSound();
       };
-      const badgeBg = (lvl <= 3) ? 'var(--primary)' : (lvl <= 7 ? 'var(--accent-blue)' : 'var(--accent-purple)');
+      const badgeBg = (lvl <= 2) ? 'var(--primary)' : (lvl <= 4 ? 'var(--accent-blue)' : 'var(--accent-purple)');
       card.innerHTML = `
         <div class="level-card-badge" style="background:${badgeBg}; color:#fff;">
           Lv ${lvl}
@@ -21762,7 +23099,8 @@
       id: "p_" + Date.now(),
       name: name,
       avatar: welcomeSelectedAvatar,
-      level: welcomeSelectedLevel,
+      targetLang: welcomeSelectedTargetLang || 'en',
+      level: (welcomeSelectedTargetLang === 'ja') ? 1 : welcomeSelectedLevel,
       dictLang: welcomeSelectedDictLang || 'ko',
       xp: 0,
       streak: 1,
@@ -21788,15 +23126,18 @@
     const list = document.getElementById('unitSelectList');
     list.innerHTML = "";
     const curLvl = currentProfile ? (currentProfile.level || 1) : 1;
+    const activeRoadmap = getActiveRoadmap();
+    const maxLvl = getActiveUnitsCount();
 
-    for (let lvl = 1; lvl <= 10; lvl++) {
-      const data = ROADMAP_DATA[lvl];
+    for (let lvl = 1; lvl <= maxLvl; lvl++) {
+      const data = activeRoadmap[lvl];
+      if (!data) continue;
       const isCur = (lvl === curLvl);
       const item = document.createElement('div');
       item.className = `level-card-opt ${isCur ? 'selected' : ''}`;
       item.onclick = () => selectUnit(lvl);
 
-      const badgeBg = (lvl <= 3) ? 'var(--primary)' : (lvl <= 7 ? 'var(--accent-blue)' : 'var(--accent-purple)');
+      const badgeBg = (lvl <= 2) ? 'var(--primary)' : (lvl <= 4 ? 'var(--accent-blue)' : 'var(--accent-purple)');
       item.innerHTML = `
         <div class="level-card-badge" style="background:${badgeBg}; color:#fff;">
           Lv ${lvl}
@@ -21826,7 +23167,9 @@
     renderMapNodes();
     closeModal('unitSelectModal');
     playChime();
-    showToast(`Unit ${lvl} (${ROADMAP_DATA[lvl].title}) 단원으로 이동했습니다! 🦉`);
+    const activeRoadmap = getActiveRoadmap();
+    const uTitle = (activeRoadmap[lvl] && activeRoadmap[lvl].title) ? activeRoadmap[lvl].title : "";
+    showToast(`Unit ${lvl} (${uTitle}) 단원으로 이동했습니다! 🦉`);
   }
 
   function saveProfiles() {
@@ -21849,16 +23192,32 @@
     document.getElementById('streakCount').textContent = (currentProfile.streak || 1) + "일차";
     document.getElementById('xpCount').textContent = currentProfile.xp;
 
-    // Update Unit Banner based on level
-    const lvl = currentProfile.level || 1;
-    const unitData = ROADMAP_DATA[lvl] || ROADMAP_DATA[1];
+    // Update Language Pill in Header
+    const isJa = (currentProfile.targetLang === 'ja');
+    const langIconEl = document.getElementById('headerLangIcon');
+    const langTextEl = document.getElementById('headerLangText');
+    if (langIconEl && langTextEl) {
+      langIconEl.textContent = isJa ? "🇯🇵" : "🇺🇸";
+      langTextEl.textContent = isJa ? "일본어" : "영어";
+    }
+
+    // Update Unit Banner based on active roadmap & clamped level
+    const activeRoadmap = getActiveRoadmap();
+    const maxLvl = getActiveUnitsCount();
+    let lvl = currentProfile.level || 1;
+    if (lvl > maxLvl) {
+      lvl = 1;
+      currentProfile.level = 1;
+      saveProfiles();
+    }
+    const unitData = activeRoadmap[lvl] || activeRoadmap[1];
     document.getElementById('unitBadge').textContent = unitData.badge;
     document.getElementById('unitTitle').textContent = unitData.title;
     document.getElementById('unitDesc').textContent = unitData.desc;
     document.getElementById('unitIcon').textContent = unitData.icon;
 
     const banner = document.getElementById('unitBanner');
-    banner.className = "unit-banner " + (lvl <= 3 ? "lv-green" : (lvl <= 7 ? "" : "lv-purple"));
+    banner.className = "unit-banner " + (lvl <= 2 ? "lv-green" : (lvl <= 4 ? "" : "lv-purple"));
 
     // Update Dict Lang toggle button
     const dictToggleBtn = document.getElementById('readingDictToggle');
@@ -21888,8 +23247,11 @@
     if (!container) return;
     container.innerHTML = "";
     if (!currentProfile) return;
-    const lvl = currentProfile.level || 1;
-    const unitData = ROADMAP_DATA[lvl] || ROADMAP_DATA[1];
+    const activeRoadmap = getActiveRoadmap();
+    const maxLvl = getActiveUnitsCount();
+    let lvl = currentProfile.level || 1;
+    if (lvl > maxLvl) lvl = 1;
+    const unitData = activeRoadmap[lvl] || activeRoadmap[1];
 
     const fragment = document.createDocumentFragment();
     unitData.stages.forEach((stage, idx) => {
@@ -21927,8 +23289,11 @@
   // 4. SPEAKING SESSION CONTROLLER
   // -------------------------------------------------------------
   function startStage(stageId) {
-    const lvl = currentProfile.level || 1;
-    const unitData = ROADMAP_DATA[lvl] || ROADMAP_DATA[1];
+    const activeRoadmap = getActiveRoadmap();
+    const maxLvl = getActiveUnitsCount();
+    let lvl = currentProfile.level || 1;
+    if (lvl > maxLvl) lvl = 1;
+    const unitData = activeRoadmap[lvl] || activeRoadmap[1];
     currentStage = unitData.stages.find(s => s.id === stageId);
     if (!currentStage) return;
 
@@ -21937,28 +23302,67 @@
     document.getElementById('sessionHearts').textContent = "5";
     updateSessionProgress(0);
 
-    // Initial AI turn
-    setupAiTurn(currentStage.firstLine, currentStage.firstLineKo, {
-      words: ["Yes", "Please", "Thank you"],
-      starter: "I'd like to...",
-      full: "Yes, please. I'd like to have that."
-    });
+    const isJa = (currentProfile && currentProfile.targetLang === 'ja');
+    if (isJa) {
+      setupAiTurn(
+        currentStage.firstLine,
+        currentStage.firstLineKo,
+        currentStage.hints || {
+          words: ["はじめまして", "よろしくお願いします"],
+          starter: "はじめまして...",
+          full: "はじめまして、よろしくお願いします！"
+        },
+        currentStage.firstLinePhonetic,
+        currentStage.firstLineRomaji
+      );
+    } else {
+      setupAiTurn(currentStage.firstLine, currentStage.firstLineKo, {
+        words: ["Yes", "Please", "Thank you"],
+        starter: "I'd like to...",
+        full: "Yes, please. I'd like to have that."
+      });
+    }
 
     playChime();
   }
 
-  function setupAiTurn(textEn, textKo, hints) {
-    document.getElementById('aiSpeechText').textContent = textEn;
+  function setupAiTurn(textLine, textKo, hints, phonetics, romaji) {
+    const isJa = (currentProfile && currentProfile.targetLang === 'ja');
+    document.getElementById('aiSpeechText').textContent = textLine;
     document.getElementById('aiSubText').textContent = textKo;
     document.getElementById('aiSubText').style.display = "none";
 
+    // Render Japanese Beginner Phonetics & Romaji
+    const phoneticsWrap = document.getElementById('aiPhoneticsWrap');
+    if (phoneticsWrap) {
+      const pText = phonetics || (currentTurn === 0 && currentStage ? currentStage.firstLinePhonetic : "");
+      const rText = romaji || (currentTurn === 0 && currentStage ? currentStage.firstLineRomaji : "");
+      if (isJa && (pText || rText)) {
+        phoneticsWrap.style.display = "block";
+        document.getElementById('aiPhoneticKo').textContent = pText ? `🗣️ 한글 발음: ${pText}` : "";
+        document.getElementById('aiRomaji').textContent = rText ? `🔤 로마자: ${rText}` : "";
+      } else {
+        phoneticsWrap.style.display = "none";
+      }
+    }
+
     // Setup Hints
-    document.getElementById('hintWords').textContent = (hints && hints.words) ? hints.words.join(', ') : "iced latte, decaf";
-    document.getElementById('hintStarter').textContent = (hints && hints.starter) ? hints.starter : "Could you make that...";
-    document.getElementById('hintFull').textContent = (hints && hints.full) ? hints.full : "Could you make that decaf, please?";
+    const hintWordsEl = document.getElementById('hintWords');
+    const hintStarterEl = document.getElementById('hintStarter');
+    const hintFullEl = document.getElementById('hintFull');
+    if (hints) {
+      if (isJa && hints.wordsPhonetic && hints.words) {
+        hintWordsEl.textContent = hints.words.map((w, i) => `${w} [${hints.wordsPhonetic[i] || ''}]`).join(', ');
+      } else {
+        hintWordsEl.textContent = (hints.words) ? hints.words.join(', ') : (isJa ? "はい, ありがとうございます" : "iced latte, decaf");
+      }
+      hintStarterEl.textContent = hints.starter || (isJa ? "はい、..." : "Could you make that...");
+      hintFullEl.textContent = (hints.full || "-") + (hints.fullKo ? ` (${hints.fullKo})` : "");
+    }
 
     // Reset User Input UI
-    document.getElementById('userTranscriptBox').innerHTML = '<span class="placeholder-pulse">하단 마이크를 누르고 영어로 말해보세요 🎙️</span>';
+    const placeholderMsg = isJa ? "하단 마이크를 누르고 일본어로 말해보세요 🎙️ (발음 힌트를 보며 천천히 따라 읽어도 좋아요)" : "하단 마이크를 누르고 영어로 말해보세요 🎙️";
+    document.getElementById('userTranscriptBox').innerHTML = `<span class="placeholder-pulse">${placeholderMsg}</span>`;
     document.getElementById('feedbackContainer').style.display = "none";
     document.getElementById('feedbackContainer').innerHTML = "";
     document.getElementById('konglishBanner').style.display = "none";
@@ -21971,7 +23375,7 @@
     document.getElementById('hintDrawer').style.display = "none";
 
     // Automatically Speak AI line
-    speakText(textEn);
+    speakText(textLine);
   }
 
   function playAiSpeechAgain() {
@@ -22081,6 +23485,7 @@
       recognition.stop();
     } else {
       try {
+        recognition.lang = (currentProfile && currentProfile.targetLang === 'ja') ? 'ja-JP' : 'en-US';
         recognition.start();
       } catch(e) {
         recognition.stop();
@@ -22103,6 +23508,7 @@
   // 6. KONGLISH RADAR (Real-time Koreanism Detector)
   // -------------------------------------------------------------
   function checkKonglishRealtime(text) {
+    if (currentProfile && currentProfile.targetLang === 'ja') return;
     const lower = text.toLowerCase();
     for (const [key, val] of Object.entries(KONGLISH_DICT)) {
       if (lower.includes(key)) {
@@ -22119,12 +23525,38 @@
   // 7. GEMINI 3.6 FLASH API CALLER & 3-TIER PARAPHRASING
   // -------------------------------------------------------------
   async function processUserSpeechWithGemini(userUtterance) {
-    showToast("Gemini 3.6 Flash가 분석 중입니다... 🧠");
+    const isJa = (currentProfile && currentProfile.targetLang === 'ja');
+    showToast(isJa ? "Gemini가 일본어 발화를 분석 중입니다... 🧠" : "Gemini 3.6 Flash가 분석 중입니다... 🧠");
     const apiKey = localStorage.getItem('duospeak_api_key') || DEFAULT_GEMINI_KEY;
     const model = localStorage.getItem('duospeak_model') || DEFAULT_GEMINI_MODEL;
     const lvl = currentProfile.level || 1;
 
-    const prompt = `You are a native English conversation tutor for a Korean student at CEFR Level ${lvl}/10.
+    let prompt = "";
+    if (isJa) {
+      prompt = `You are a patient Japanese conversation tutor for an absolute beginner Korean student (Unit ${lvl}/5).
+Current scenario role: "${currentStage.role || '상대방'}" in situation "${currentStage.title}".
+The previous AI line was: "${document.getElementById('aiSpeechText').textContent}".
+The student just said: "${userUtterance}".
+
+Respond strictly with a JSON object (no markdown, no code block backticks) with this exact schema:
+{
+  "nextAiReply": "Your natural in-character Japanese line with Kanji/Kana (keep it simple for absolute beginners, 1 short sentence)",
+  "nextAiReplyPhonetic": "Korean phonetic pronunciation of nextAiReply (e.g. '콘니치와, 오겡키데스카?')",
+  "nextAiReplyRomaji": "Romaji of nextAiReply (e.g. 'Konnichiwa, ogenki desu ka?')",
+  "nextAiReplyKo": "Korean translation of nextAiReply",
+  "grammarFix": "Correction or praise in Korean for user's utterance",
+  "nativeWay": "Natural Japanese expression (Kanji/Kana) with Korean pronunciation in parentheses",
+  "casualSlang": "Casual/friendly everyday Japanese phrase with Korean pronunciation",
+  "hintsForStudent": {
+    "words": ["단어1", "단어2"],
+    "wordsPhonetic": ["발음1", "발음2"],
+    "starter": "일본어 시작구 (한글 발음)",
+    "full": "일본어 완성 문장 (한글 발음)",
+    "fullKo": "한국어 뜻"
+  }
+}`;
+    } else {
+      prompt = `You are a native English conversation tutor for a Korean student at CEFR Level ${lvl}/10.
 Current scenario role: "${currentStage.role || 'Partner'}" in situation "${currentStage.title}".
 The previous AI line was: "${document.getElementById('aiSpeechText').textContent}".
 The student just said: "${userUtterance}".
@@ -22142,6 +23574,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     "full": "Complete model response sentence..."
   }
 }`;
+    }
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     const payload = {
@@ -22166,14 +23599,34 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     } catch(err) {
       console.error("Gemini Error:", err);
       // Friendly fallback so user flow is never broken
-      const fallback = {
-        nextAiReply: "That sounds wonderful! What do you want to do next?",
-        nextAiReplyKo: "좋은 생각이네요! 다음엔 뭘 하고 싶으신가요?",
-        grammarFix: userUtterance,
-        nativeWay: "Sounds like a solid plan!",
-        casualSlang: "I'm down for that!",
-        hintsForStudent: { words: ["Sounds good", "Let's go"], starter: "I think we should...", full: "Sounds good to me, let's do it!" }
-      };
+      let fallback;
+      if (isJa) {
+        fallback = {
+          nextAiReply: "いいですね！次はどうしますか？",
+          nextAiReplyPhonetic: "이이데스네! 츠기와 도- 시마스카?",
+          nextAiReplyRomaji: "Ii desu ne! Tsugi wa dou shimasu ka?",
+          nextAiReplyKo: "좋네요! 다음엔 어떻게 할까요?",
+          grammarFix: "아주 자연스러운 발화입니다! 잘하셨어요 👍",
+          nativeWay: "大丈夫ですよ、任せてください (다이죠-부데스요, 마카세테 쿠다사이)",
+          casualSlang: "いいね！ (이이네!)",
+          hintsForStudent: {
+            words: ["いいですね", "お願いします"],
+            wordsPhonetic: ["이이데스네", "오네가이시마스"],
+            starter: "じゃあ... (쟈-)",
+            full: "じゃあ、それでお願いします！ (쟈-, 소레데 오네가이시마스!)",
+            fullKo: "그럼 그걸로 부탁드려요!"
+          }
+        };
+      } else {
+        fallback = {
+          nextAiReply: "That sounds wonderful! What do you want to do next?",
+          nextAiReplyKo: "좋은 생각이네요! 다음엔 뭘 하고 싶으신가요?",
+          grammarFix: userUtterance,
+          nativeWay: "Sounds like a solid plan!",
+          casualSlang: "I'm down for that!",
+          hintsForStudent: { words: ["Sounds good", "Let's go"], starter: "I think we should...", full: "Sounds good to me, let's do it!" }
+        };
+      }
       renderFeedbackAndNextTurn(userUtterance, fallback);
     }
   }
@@ -22249,7 +23702,9 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     window._pendingNextTurn = {
       textEn: res.nextAiReply,
       textKo: res.nextAiReplyKo,
-      hints: res.hintsForStudent
+      hints: res.hintsForStudent,
+      phonetics: res.nextAiReplyPhonetic || "",
+      romaji: res.nextAiReplyRomaji || ""
     };
 
     document.getElementById('btnMic').style.display = "none";
@@ -22351,7 +23806,13 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       completeStage();
     } else {
       if (window._pendingNextTurn) {
-        setupAiTurn(window._pendingNextTurn.textEn, window._pendingNextTurn.textKo, window._pendingNextTurn.hints);
+        setupAiTurn(
+          window._pendingNextTurn.textEn,
+          window._pendingNextTurn.textKo,
+          window._pendingNextTurn.hints,
+          window._pendingNextTurn.phonetics,
+          window._pendingNextTurn.romaji
+        );
       }
     }
   }
@@ -22412,13 +23873,22 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     if (!speechSynth) return;
     speechSynth.cancel();
 
+    const isJa = (currentProfile && currentProfile.targetLang === 'ja');
     const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'en-US';
+    utter.lang = isJa ? 'ja-JP' : 'en-US';
     
-    // Choose natural English voice if available
     const voices = speechSynth.getVoices();
-    const usVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes("Samantha") || v.name.includes("Natural") || v.name.includes("Google")));
-    if (usVoice) utter.voice = usVoice;
+    if (isJa) {
+      const jaVoice = voices.find(v => v.lang.startsWith("ja") && (v.name.includes("Kyoko") || v.name.includes("Otoya") || v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Japanese")));
+      if (jaVoice) utter.voice = jaVoice;
+      else {
+        const anyJa = voices.find(v => v.lang.startsWith("ja"));
+        if (anyJa) utter.voice = anyJa;
+      }
+    } else {
+      const usVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes("Samantha") || v.name.includes("Natural") || v.name.includes("Google")));
+      if (usVoice) utter.voice = usVoice;
+    }
 
     const baseSpeed = parseFloat(localStorage.getItem('duospeak_voice_speed') || '1.0');
     utter.rate = overrideSpeed || baseSpeed;
@@ -22588,7 +24058,11 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
         <div style="display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 30px;">${p.avatar}</span>
           <div>
-            <div style="font-weight: 800; font-size: 15px;">${p.name} ${isCurrent ? '<span style="color:var(--primary); font-size:12px;">(현재 사용 중)</span>' : ''}</div>
+            <div style="font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 6px;">
+              <span>${p.name}</span>
+              ${p.targetLang === 'ja' ? '<span style="background: rgba(239,68,68,0.2); color: #f87171; font-size: 11px; padding: 2px 6px; border-radius: 6px; font-weight: 800;">🇯🇵 일본어</span>' : '<span style="background: rgba(59,130,246,0.2); color: #60a5fa; font-size: 11px; padding: 2px 6px; border-radius: 6px; font-weight: 800;">🇺🇸 영어</span>'}
+              ${isCurrent ? '<span style="color:var(--primary); font-size:12px;">(현재 사용 중)</span>' : ''}
+            </div>
             <div style="font-size: 12px; color: var(--text-muted);">Lv ${p.level} · 🔥 ${p.streak}일 연속 · ⚡ ${p.xp} XP</div>
           </div>
         </div>
@@ -22655,10 +24129,25 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     playClickSound();
   }
 
+  function onProfileTargetLangChange() {
+    const sel = document.getElementById('newProfileTargetLang');
+    const lvlGroup = document.getElementById('newProfileLevel') ? document.getElementById('newProfileLevel').closest('.form-group') : null;
+    if (lvlGroup) {
+      if (sel && sel.value === 'ja') {
+        lvlGroup.style.opacity = '0.5';
+        lvlGroup.title = '일본어는 왕초보 1단계부터 시작합니다.';
+      } else {
+        lvlGroup.style.opacity = '1.0';
+        lvlGroup.title = '';
+      }
+    }
+  }
+
   function addNewProfile() {
     const name = document.getElementById('newProfileName').value.trim();
     if (!name) { alert("이름이나 별명을 입력해 주세요!"); return; }
-    const lvl = parseInt(document.getElementById('newProfileLevel').value);
+    const targetLang = document.getElementById('newProfileTargetLang') ? document.getElementById('newProfileTargetLang').value : 'en';
+    const lvl = (targetLang === 'ja') ? 1 : parseInt(document.getElementById('newProfileLevel').value || 1);
 
     const dictLang = document.getElementById('newProfileDictLang') ? document.getElementById('newProfileDictLang').value : 'ko';
 
@@ -22666,6 +24155,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       id: "p_" + Date.now(),
       name: name,
       avatar: selectedAvatar,
+      targetLang: targetLang,
       level: lvl,
       dictLang: dictLang,
       xp: 0,
@@ -22684,7 +24174,8 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     renderMapNodes();
     closeModal('profileModal');
     playCompleteFanfare();
-    showToast(`반가워요, ${name}님! 즐거운 회화를 시작해 볼까요? 🎉`);
+    const langMsg = (targetLang === 'ja') ? '일본어 왕초보 회화' : '영어 회화 & 리딩';
+    showToast(`반가워요, ${name}님! 즐거운 ${langMsg}를 시작해 볼까요? 🎉`);
   }
 
   function openSettingsModal() {
@@ -22785,7 +24276,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       if (tabReading) tabReading.classList.add('active');
       if (mainMapView) mainMapView.style.display = "none";
       if (mainReadingView) mainReadingView.style.display = "block";
-      filterReadingArticles(currentReadingFilter || 'my');
+      filterReadingArticles(currentReadingLevelFilter || 'my');
       window.scrollTo(0, 0);
     } else if (tabName === 'vocab') {
       if (tabVocab) tabVocab.classList.add('active');
@@ -22798,7 +24289,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   let currentReadingSearchQuery = '';
 
   function filterReadingArticles(type) {
-    currentReadingLevelFilter = type;
+    currentReadingLevelFilter = type || 'my';
     ['filterMy', 'filterAll', 'filterBeg', 'filterMid', 'filterAdv'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.remove('active');
@@ -22833,6 +24324,42 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   }
 
   function applyReadingFilters() {
+    const isJa = (currentProfile && currentProfile.targetLang === 'ja');
+    const container = document.getElementById('articlesListContainer');
+    let notice = document.getElementById('readingJaNotice');
+
+    if (isJa) {
+      if (!notice) {
+        notice = document.createElement('div');
+        notice.id = 'readingJaNotice';
+        notice.innerHTML = `
+          <div style="text-align:center; padding: 45px 24px; background: rgba(255,255,255,0.04); border: 2px dashed rgba(255,255,255,0.18); border-radius: 24px; margin: 24px 0;">
+            <div style="font-size: 54px; margin-bottom: 14px;">🇯🇵 🗣️</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 10px;">일본어는 왕초보 회화 집중 코스입니다</h3>
+            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 460px; margin: 0 auto 24px;">
+              일본어 학습은 히라가나를 몰라도 입을 열 수 있는 <strong>완전 기초 50개 실전 롤플레잉 회화 (한글 발음 & 로마자 4중 표기)</strong>에 특화되어 있습니다.<br><br>
+              📚 300편의 방대한 리딩 라이브러리는 <strong>영어 학습 모드</strong>에서 자유롭게 이용하실 수 있습니다!
+            </p>
+            <button class="btn-3d btn-green" onclick="toggleCurrentLanguage()" style="border-radius: 14px; padding: 14px 28px; font-size: 14px; font-weight: 800;">
+              🇺🇸 영어 모드로 전환하여 300편 리딩 읽기
+            </button>
+          </div>
+        `;
+        if (container && container.parentNode) {
+          container.parentNode.insertBefore(notice, container);
+        }
+      } else {
+        notice.style.display = 'block';
+      }
+      if (container) container.style.display = 'none';
+      const countEl = document.getElementById('readingFilteredCount');
+      if (countEl) countEl.textContent = '0';
+      return;
+    } else {
+      if (notice) notice.style.display = 'none';
+      if (container) container.style.display = 'flex';
+    }
+
     const curLvl = currentProfile ? (currentProfile.level || 1) : 1;
     let filtered = READING_ARTICLES;
 
@@ -22873,6 +24400,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     const fragment = document.createDocumentFragment();
     articles.forEach(art => {
       const card = document.createElement('div');
+      card.className = "article-card";
       card.style.cssText = `
         background: #17242C; border: 2px solid var(--card-border); border-radius: 20px;
         padding: 16px 18px; cursor: pointer; transition: border-color 0.15s ease;
