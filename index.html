@@ -1539,6 +1539,28 @@
 </div>
 
 <!-- ========================================== -->
+<!-- ========================================== -->
+<!-- 📱 MODAL: Startup Profile Selector         -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="startupProfileModal" style="z-index: 999;">
+  <div class="modal-card" style="max-width: 480px; text-align: center;">
+    <div style="font-size: 52px; margin-bottom: 10px;">🦉</div>
+    <h3 class="modal-title" style="font-size: 20px; margin-bottom: 6px;">누가 공부할까요?</h3>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5;">
+      오늘 학습할 언어와 프로필을 선택해 주세요.<br>
+      <span style="font-size: 11px; color: var(--primary);">💡 한 기기에서 영어와 일본어를 자유롭게 오가며 공부할 수 있습니다.</span>
+    </p>
+
+    <div id="startupProfileList" style="display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 2px; margin-bottom: 16px;">
+      <!-- Injected by JS -->
+    </div>
+
+    <button class="btn-3d btn-outline" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 14px;" onclick="closeModal('startupProfileModal'); openProfileModal();">
+      ➕ 새 프로필 추가하기
+    </button>
+  </div>
+</div>
+
 <!-- 👤 MODAL: Profile & Level Switcher         -->
 <!-- ========================================== -->
 <div class="modal-overlay" id="profileModal">
@@ -27955,10 +27977,19 @@
       return false;
     }
 
-    // Auto-Resume to Last Active Profile
+    // If exactly 1 profile is registered on this device, proceed directly without prompt
+    if (profiles.length === 1) {
+      currentProfile = profiles[0];
+      localStorage.setItem('duospeak_active_profile_id', currentProfile.id);
+      updateHeaderStats();
+      return true;
+    }
+
+    // If 2 or more profiles exist (e.g. English + Japanese), show startup profile selector
     const lastActiveId = localStorage.getItem('duospeak_active_profile_id') || profiles[0].id;
     currentProfile = profiles.find(p => p.id === lastActiveId) || profiles[0];
     updateHeaderStats();
+    openStartupProfileSelectModal();
     return true;
   }
 
@@ -28988,6 +29019,78 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
   // -------------------------------------------------------------
   // 9. PROFILE & SETTINGS MODALS
   // -------------------------------------------------------------
+  
+  // -------------------------------------------------------------
+  // STARTUP PROFILE SELECTION (For multi-profile phones)
+  // -------------------------------------------------------------
+  function openStartupProfileSelectModal() {
+    renderStartupProfileList();
+    const modal = document.getElementById('startupProfileModal');
+    if (modal) {
+      modal.classList.add('active');
+      playChime();
+    }
+  }
+
+  function renderStartupProfileList() {
+    const list = document.getElementById('startupProfileList');
+    if (!list) return;
+    list.innerHTML = "";
+
+    profiles.forEach(p => {
+      const isCurrent = currentProfile && (p.id === currentProfile.id);
+      const isJa = (p.targetLang === 'ja');
+      const item = document.createElement('div');
+      item.style.cssText = `
+        display: flex; align-items: center; justify-content: space-between;
+        background: ${isCurrent ? 'rgba(88,204,2,0.15)' : '#101B20'};
+        border: 2px solid ${isCurrent ? 'var(--primary)' : 'var(--card-border)'};
+        border-radius: 18px; padding: 14px 18px; cursor: pointer; text-align: left;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      `;
+      item.onmouseenter = () => item.style.transform = 'translateY(-2px)';
+      item.onmouseleave = () => item.style.transform = 'translateY(0)';
+      item.onclick = () => selectStartupProfile(p.id);
+
+      const langBadge = isJa ? 
+        '<span style="background: rgba(239,68,68,0.2); color: #f87171; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">🇯🇵 일본어 회화</span>' :
+        '<span style="background: rgba(59,130,246,0.2); color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">🇺🇸 영어 회화 & 리딩</span>';
+
+      item.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span style="font-size: 34px;">${p.avatar || '🦉'}</span>
+          <div>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+              <span style="font-weight: 900; font-size: 16px; color: #FFFFFF;">${p.name}</span>
+              ${langBadge}
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted);">
+              Lv ${p.level || 1} · 🔥 ${p.streak || 1}일 연속 · ⚡ ${p.xp || 0} XP
+            </div>
+          </div>
+        </div>
+        <button class="btn-3d ${isCurrent ? 'btn-green' : 'btn-outline'}" style="padding: 8px 16px; font-size: 13px; border-radius: 12px; pointer-events: none;">
+          ${isCurrent ? '선택됨' : '선택'}
+        </button>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function selectStartupProfile(profileId) {
+    const target = profiles.find(p => p.id === profileId);
+    if (target) {
+      currentProfile = target;
+      localStorage.setItem('duospeak_active_profile_id', target.id);
+      updateHeaderStats();
+      renderMapNodes();
+      closeModal('startupProfileModal');
+      playCompleteFanfare();
+      const langName = (target.targetLang === 'ja') ? '🇯🇵 일본어 왕초보 회화' : '🇺🇸 영어 회화 & 리딩';
+      showToast(`${target.name}님 환영합니다! ${langName} 학습을 시작합니다. 🦉`);
+    }
+  }
+
   function openProfileModal() {
     renderProfileList();
     document.getElementById('profileModal').classList.add('active');
