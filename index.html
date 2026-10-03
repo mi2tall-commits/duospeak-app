@@ -1879,7 +1879,8 @@
   // -------------------------------------------------------------
   // 1. CONFIG & DEFAULT PRESETS
   // -------------------------------------------------------------
-  const DEFAULT_GEMINI_KEY = atob("QVEuQWI4Uk42SU5JakgzTWQxd1NzcklHNjZud1BfNzBQLUltUUs1ZVVaaUxyZllqNWo3M2c=");
+  // API keys must never be embedded in this public page; each user enters their own in Settings.
+  const DEFAULT_GEMINI_KEY = "";
   const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
 
   // 10-Level System Roadmaps (100 Extensive Stages)
@@ -28521,6 +28522,9 @@
     showToast(isJa ? "Gemini가 일본어 발화를 분석 중입니다... 🧠" : "Gemini 3.6 Flash가 분석 중입니다... 🧠");
     const apiKey = localStorage.getItem('duospeak_api_key') || DEFAULT_GEMINI_KEY;
     const model = localStorage.getItem('duospeak_model') || DEFAULT_GEMINI_MODEL;
+    if (!apiKey) {
+      showToast("설정(⚙️)에서 Gemini API 키를 입력해 주세요.");
+    }
     const lvl = currentProfile.level || 1;
 
     let prompt = "";
