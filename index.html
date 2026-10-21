@@ -28460,7 +28460,8 @@
     recognition.onend = function() {
       stopRecordingUI();
       const userText = document.getElementById('userTranscriptBox').innerText.trim();
-      if (userText && userText !== "하단 마이크를 누르고 영어로 말해보세요 🎙️") {
+      const hasPlaceholder = !!document.querySelector('#userTranscriptBox .placeholder-pulse');
+      if (userText && !hasPlaceholder) {
         processUserSpeechWithGemini(userText);
       }
     };
@@ -28502,6 +28503,7 @@
   // -------------------------------------------------------------
   function checkKonglishRealtime(text) {
     if (currentProfile && currentProfile.targetLang === 'ja') return;
+    if (typeof KONGLISH_DICT === 'undefined') return;
     const lower = text.toLowerCase();
     for (const [key, val] of Object.entries(KONGLISH_DICT)) {
       if (lower.includes(key)) {
@@ -28596,6 +28598,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
         body: JSON.stringify(payload)
       });
       const data = await response.json();
+      if (!response.ok) throw new Error((data && data.error && data.error.message) || `HTTP ${response.status}`);
       
       let rawText = data.candidates[0].content.parts[0].text.trim();
       if (rawText.startsWith("```json")) rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -28605,6 +28608,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       renderFeedbackAndNextTurn(userUtterance, parsed);
     } catch(err) {
       console.error("Gemini Error:", err);
+      showToast("Gemini 응답 오류로 기본 피드백을 표시합니다. 설정(⚙️)의 API 키/모델을 확인해 주세요.");
       // Friendly fallback so user flow is never broken
       let fallback;
       if (isJa) {
@@ -28757,13 +28761,23 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
     }
 
     const pushRec = new SpeechRecognition();
-    pushRec.lang = 'en-US';
+    pushRec.lang = (currentProfile && currentProfile.targetLang === 'ja') ? 'ja-JP' : 'en-US';
     pushRec.continuous = false;
     pushRec.interimResults = false;
 
     pushRec.onresult = function(e) {
       const spoken = e.results[0][0].transcript.trim();
-      const evalRes = evaluatePronunciation(window._currentPushedTarget, spoken);
+      let evalRes;
+      if (currentProfile && currentProfile.targetLang === 'ja') {
+        // Japanese has no spaces and evaluatePronunciation strips non-ASCII, so compare characters instead (ignoring the Korean phonetic part in parentheses)
+        const norm = (t) => (t || '').replace(/[(（][^)）]*[)）]/g, '').replace(/[\s、。！？!?,.・ー~〜「」]/g, '');
+        const targetChars = Array.from(norm(window._currentPushedTarget));
+        const spokenChars = Array.from(norm(spoken));
+        const hit = targetChars.filter(ch => spokenChars.includes(ch)).length;
+        evalRes = { score: Math.max(10, Math.min(100, Math.round((hit / Math.max(1, targetChars.length)) * 100))) };
+      } else {
+        evalRes = evaluatePronunciation(window._currentPushedTarget, spoken);
+      }
       if (evalRes.score >= 50) {
         completePushedOutputSuccess(spoken);
       } else {
@@ -30192,7 +30206,8 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
       `;
     } else {
       const fragment = document.createDocumentFragment();
-      list.forEach((item, idx) => {
+      list.forEach((item) => {
+        const idx = allList.indexOf(item);
         const card = document.createElement('div');
         card.className = "vocab-card";
         card.style.cssText = "background:#101B20; border:1px solid var(--card-border); border-radius:14px; padding:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;";
@@ -30421,7 +30436,7 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
 
   function escapeQuotes(str) {
     if (!str) return "";
-    return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    return String(str).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\r?\n/g, " ").replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   }
 
   // Start app on DOMContentLoaded
