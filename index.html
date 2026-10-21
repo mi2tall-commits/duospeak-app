@@ -1882,6 +1882,22 @@
   // 키는 화면 코드에 넣지 않는다. 각 기기에서 설정(⚙️)에 직접 입력한 키만 쓴다.
   const DEFAULT_GEMINI_KEY = "";
   const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
+  const KONGLISH_DICT = {
+    "dutch pay": { ko: "더치페이", native: "Split the bill / Go Dutch" },
+    "handphone": { ko: "핸드폰", native: "Phone / Cell phone" },
+    "skinship": { ko: "스킨십", native: "Physical affection / Touch" },
+    "service": { ko: "서비스(무료)", native: "On the house / Complimentary" },
+    "sharp": { ko: "샤프 펜슬", native: "Mechanical pencil" },
+    "meeting": { ko: "소개팅/미팅", native: "Blind date / Group date" },
+    "cider": { ko: "사이다(음료)", native: "Sprite / Lemon-lime soda" },
+    "sign": { ko: "연예인 사인", native: "Autograph" },
+    "sns": { ko: "SNS", native: "Social media" },
+    "health club": { ko: "헬스장", native: "Gym / Fitness center" },
+    "as": { ko: "AS(사후서비스)", native: "Warranty / Customer service / Repair" },
+    "one plus one": { ko: "원플러스원", native: "Buy one, get one free (BOGO)" },
+    "eye shopping": { ko: "아이쇼핑", native: "Window shopping" },
+    "morning call": { ko: "모닝콜", native: "Wake-up call" }
+  };
 
   // 10-Level System Roadmaps (100 Extensive Stages)
   const ROADMAP_DATA = {
@@ -28049,18 +28065,21 @@
     const roadmap = isJa ? ROADMAP_DATA_JA : ROADMAP_DATA;
     const maxLvl = isJa ? 25 : 10;
     if (welcomeSelectedLevel > maxLvl) welcomeSelectedLevel = 1;
+    const lastLvl = isJa ? 1 : maxLvl;
 
-    for (let lvl = 1; lvl <= maxLvl; lvl++) {
+    for (let lvl = 1; lvl <= lastLvl; lvl++) {
       const data = roadmap[lvl];
       if (!data) continue;
-      const isSel = (lvl === welcomeSelectedLevel);
+      const isSel = isJa ? true : (lvl === welcomeSelectedLevel);
       const card = document.createElement('div');
       card.className = `level-card-opt ${isSel ? 'selected' : ''}`;
-      card.onclick = () => {
-        welcomeSelectedLevel = lvl;
-        renderWelcomeLevels();
-        playClickSound();
-      };
+      if (!isJa) {
+        card.onclick = () => {
+          welcomeSelectedLevel = lvl;
+          renderWelcomeLevels();
+          playClickSound();
+        };
+      }
       const badgeBg = (lvl <= 2) ? 'var(--primary)' : (lvl <= 4 ? 'var(--accent-blue)' : 'var(--accent-purple)');
       card.innerHTML = `
         <div class="level-card-badge" style="background:${badgeBg}; color:#fff;">
@@ -28075,6 +28094,12 @@
         </div>
       `;
       grid.appendChild(card);
+    }
+    if (isJa) {
+      const note = document.createElement('div');
+      note.style.cssText = 'font-size: 11px; color: var(--text-muted); padding: 2px 4px;';
+      note.textContent = '일본어는 왕초보 Unit 1부터 시작합니다. 단원은 학습 중 단원 변경에서 바꿀 수 있어요.';
+      grid.appendChild(note);
     }
   }
 
@@ -28506,7 +28531,7 @@
     if (typeof KONGLISH_DICT === 'undefined') return;
     const lower = text.toLowerCase();
     for (const [key, val] of Object.entries(KONGLISH_DICT)) {
-      if (lower.includes(key)) {
+      if (new RegExp('\\b' + key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(lower)) {
         const banner = document.getElementById('konglishBanner');
         document.getElementById('konglishText').innerHTML = `<b>${val.ko} (${key})</b> 감지! 원어민 표현 ➔ <b>${val.native}</b>`;
         banner.style.display = "flex";
@@ -28844,7 +28869,6 @@ Respond strictly with a JSON object (no markdown, no code block backticks) with 
 
     if (!currentProfile.completed.includes(currentStage.id)) {
       currentProfile.completed.push(currentStage.id);
-      currentProfile.streak += 1;
       currentProfile.xp += 50;
       saveProfiles();
     }
